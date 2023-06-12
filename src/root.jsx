@@ -3,7 +3,7 @@ import { Outlet, Link } from "react-router-dom";
 export default function Root() {
   return (
     <div
-      data-theme="cupcake"
+      // data-theme="cupcake"
       className="flex flex-row min-w-screen min-h-screen overflow-hidden"
     >
       <div className="w-20 bg-base-200 flex flex-col gap-2 p-3">
