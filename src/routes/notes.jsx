@@ -20,7 +20,6 @@ export default function Notes() {
           theme="vs-dark"
           defaultLanguage="markdown"
           defaultValue="// some comment from carl"
-          className=" bg-green-300"
         />
       </div>
     </div>
