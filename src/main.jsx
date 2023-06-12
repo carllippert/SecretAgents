@@ -8,6 +8,7 @@ import TestFileAccess from "./routes/testFileAccess";
 import Notes from "./routes/notes";
 import Messaging from "./routes/messaging";
 import { TauriProvider } from "./context/TauriProvider";
+import { MarkdownProvider } from "./context/MarkdownProvider";
 import "./styles.css";
 
 const router = createBrowserRouter([
@@ -39,7 +40,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <TauriProvider>
-      <RouterProvider router={router} />
+      <MarkdownProvider>
+        <RouterProvider router={router} />
+      </MarkdownProvider>
     </TauriProvider>
   </React.StrictMode>
 );

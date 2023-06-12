@@ -1,38 +1,16 @@
-import React, { useState } from "react";
-import { readDir } from "@tauri-apps/api/fs";
+import React, { useState, useEffect } from "react";
+// import { readDir } from "@tauri-apps/api/fs";
 import { FaFolder, FaFile } from "react-icons/fa";
-import { useTauriContext } from "../context/TauriProvider";
-import { useEffect } from "react";
+import { useMarkdownContext } from "../context/MarkdownProvider";
+import clsx from "clsx";
 
 const FileExplorer = () => {
-  const { fileSep, loading, documents, downloads, appDocuments } =
-    useTauriContext();
+  // const { fileSep, loading, documents, downloads, appDocuments } =
+  //   useTauriContext();
 
-  const [markdownFiles, setMarkdownFiles] = useState([]);
+  // const [markdownFiles, setMarkdownFiles] = useState([]);
 
-  const getDir = async () => {
-    try {
-      const entries = await readDir(appDocuments + "/markdown", {
-        recursive: true,
-      });
-
-      for (const entry of entries) {
-        console.log("Entry", entry);
-
-        console.log(`Entry: ${entry.path}`);
-        if (entry.children) {
-          processEntries(entry.children);
-        }
-      }
-      setMarkdownFiles(entries);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    getDir();
-  }, []);
+  const { markdownPaths, setFilePath, filePath } = useMarkdownContext();
 
   return (
     <div className="flex flex-col text-gray-300 w-64 h-screen">
@@ -41,10 +19,17 @@ const FileExplorer = () => {
       </div>
       <div className="flex-grow overflow-y-auto">
         <ul className="py-2">
-          {markdownFiles.map((file) => {
+          {markdownPaths.map((file) => {
             console.log("File", file);
             return (
-              <li className="px-4 py-2 flex items-center">
+              <li
+                className={clsx("px - 4 py-2 flex items-center", {
+                  "bg-gray-700": filePath === file.path,
+                })}
+                onClick={() => {
+                  setFilePath(file.path);
+                }}
+              >
                 <FaFile className="mr-2" />
                 <span>{file.name}</span>
               </li>
