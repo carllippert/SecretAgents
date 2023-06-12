@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* for messages */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-delay {
+  animation-name: fade-in;
+  animation-duration: 0.2s;
+  animation-delay: 0.2s;
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+/* agent_pay experiment phone */
+.scroll-container {
+  /* height: 400px; Or any other desired height */
+  overflow-y: scroll;
+  scrollbar-width: none; /* Remove scrollbar */
+  -ms-overflow-style: none; /* Remove scrollbar for IE and Edge */
+}
+
+.scroll-container::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

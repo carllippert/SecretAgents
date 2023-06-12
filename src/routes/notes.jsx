@@ -9,7 +9,7 @@ export default function Notes() {
           Notes List Container
         </div>
       </LeftPanel>
-      <div id="detail">
+      <div>
         <Outlet />
       </div>
     </div>
