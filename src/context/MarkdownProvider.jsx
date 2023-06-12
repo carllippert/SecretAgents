@@ -20,6 +20,8 @@ const MarkdownContext = React.createContext({
   filePath: undefined,
   fileContent: undefined,
   setFilePath: undefined,
+  updateFile: undefined,
+  createFile: undefined,
   markdownPaths: [],
 });
 
@@ -40,7 +42,7 @@ export function MarkdownProvider({ children }) {
     // setFileContent(readTextFile(filePath));
   };
 
-  const getDir = async () => {
+  const getDirectories = async () => {
     try {
       const entries = await readDir(appDocuments + "/markdown", {
         recursive: true,
@@ -61,8 +63,30 @@ export function MarkdownProvider({ children }) {
     }
   };
 
+  const updateFile = async (filePath, content) => {
+    try {
+      await fs.writeFile(filePath, content);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const createFile = async () => {
+    try {
+      // create new file called "newFile.md"
+      const filePath = appDocuments + "/markdown/newFile.md";
+      const content = "# New File";
+      await fs.writeFile(filePath, content);
+      //select as path
+      setFilePath(filePath);
+      getDirectories();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    getDir();
+    getDirectories();
   }, [appDocuments]);
 
   return (
@@ -72,6 +96,8 @@ export function MarkdownProvider({ children }) {
         setFilePath,
         markdownPaths,
         fileContent,
+        updateFile,
+        createFile,
       }}
     >
       {children}
