@@ -12,6 +12,7 @@
     "build_py_macos": "pyinstaller -F py/test.py --distpath src-tauri/bin/python --clean -n test-x86_64-apple-darwin"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.5.1",
     "@tauri-apps/api": "^1.3.0",
     "clsx": "^1.2.1",
     "localforage": "^1.10.0",
