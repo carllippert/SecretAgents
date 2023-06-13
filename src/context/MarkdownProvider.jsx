@@ -63,7 +63,7 @@ export function MarkdownProvider({ children }) {
         }
       }
       setMarkdownPaths(entries);
-      setFilePath(entries[0]);
+      setFilePath(entries[0].path);
     } catch (error) {
       console.error(error);
     }

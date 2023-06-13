@@ -43,7 +43,7 @@ const FileExplorer = () => {
             />
           </li>
           {markdownPaths.map((file) => {
-            console.log("File", file);
+            // console.log("File", file);
             return (
               <li
                 className={clsx("px-4 py-2 flex items-center", {
