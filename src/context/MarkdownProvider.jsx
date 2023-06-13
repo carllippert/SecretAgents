@@ -77,6 +77,18 @@ export function MarkdownProvider({ children }) {
     }
   };
 
+  const saveFileToPolyBase = async (fileName, content) => {
+    try {
+      const note = await polybase
+        .collection("Note")
+        .create([fileName, content]);
+
+      console.log("Note Saved: ", note);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const createFile = async (fileName) => {
     try {
       // create new file called "newFile.md"
@@ -86,6 +98,7 @@ export function MarkdownProvider({ children }) {
       //select as path
       setFilePath(filePath);
       getLocalDirectories();
+      saveFileToPolyBase(fileName + ".md", content);
     } catch (error) {
       console.error(error);
     }

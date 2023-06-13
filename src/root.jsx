@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { useAuth } from "@polybase/react";
-// import { Auth } from "@polybase/auth";
+import { Auth } from "@polybase/auth";
 
 // const auth = new Auth();
 
@@ -43,6 +43,10 @@ export default function Root() {
   //   //no auth state
   //   return <div>not logged in</div>;
   // }
+
+  useEffect(() => {
+    auth.ethPersonalSign();
+  }, []);
 
   return (
     <div className="flex flex-row min-w-screen min-h-screen overflow-hidden">
