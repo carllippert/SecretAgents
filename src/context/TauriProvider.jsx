@@ -5,10 +5,8 @@ import * as os from "@tauri-apps/api/os";
 import { invoke } from "@tauri-apps/api";
 import { listen } from "@tauri-apps/api/event";
 import { appWindow } from "@tauri-apps/api/window";
-import tauriConfJson from "../../src-tauri/tauri.conf.json";
 
-export const APP_NAME = tauriConfJson.package.productName;
-export const RUNNING_IN_TAURI = window.__TAURI__ !== undefined;
+import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 
 // NOTE: Add cacheable Tauri calls in this file
 //   that you want to use synchronously across components in your app
@@ -46,7 +44,7 @@ export function TauriProvider({ children }) {
         // });
         setDownloadDir(await tauriPath.downloadDir());
         const _documents = await tauriPath.documentDir();
-        console.log("documents", _documents);
+        // console.log("documents", _documents);
         setDocumentDir(_documents);
         const _osType = await os.type();
         setOsType(_osType);
@@ -57,7 +55,7 @@ export function TauriProvider({ children }) {
           recursive: true,
         });
         setAppDocuments(`${_documents}${APP_NAME}`);
-        console.log("appDocuments", `${_documents}${APP_NAME}`);
+        // console.log("appDocuments", `${_documents}${APP_NAME}`);
         setLoading(false);
         // show window if not using the window state plugin
         // https://github.com/tauri-apps/tauri/issues/1564
