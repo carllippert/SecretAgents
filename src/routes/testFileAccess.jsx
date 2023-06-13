@@ -17,7 +17,7 @@ export default function TestFileAccess() {
       for (const entry of entries) {
         console.log("Entry", entry);
 
-        console.log(`Entry: ${entry.path}`);
+        // console.log(`Entry: ${entry.path}`);
         if (entry.children) {
           processEntries(entry.children);
         }

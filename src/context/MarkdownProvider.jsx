@@ -9,7 +9,7 @@ import { appWindow } from "@tauri-apps/api/window";
 import tauriConfJson from "../../src-tauri/tauri.conf.json";
 import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 import { useTauriContext } from "./TauriProvider";
-import { usePolybase, useDocument } from "@polybase/react";
+import { usePolybase, useDocument, useCollection } from "@polybase/react";
 
 // NOTE: Add cacheable Tauri calls in this file
 //   that you want to use synchronously across components in your app
@@ -29,9 +29,12 @@ export function MarkdownProvider({ children }) {
   const { fileSep, documents, downloads, appDocuments } = useTauriContext();
 
   const polybase = usePolybase();
-  const { data, error, loading } = useDocument(
-    polybase.collection("users").record("id")
-  );
+
+  const {
+    data: polybase_notes,
+    error,
+    loading,
+  } = useCollection(polybase.collection("Note"));
 
   const [filePathString, setFilePathString] = useState("");
   const [fileContent, setFileContent] = useState("");
@@ -45,16 +48,16 @@ export function MarkdownProvider({ children }) {
     // setFileContent(readTextFile(filePath));
   };
 
-  const getDirectories = async () => {
+  const getLocalDirectories = async () => {
     try {
       const entries = await readDir(appDocuments + "/markdown", {
         recursive: true,
       });
 
       for (const entry of entries) {
-        console.log("Entry", entry);
+        // console.log("Entry", entry);
 
-        console.log(`Entry: ${entry.path}`);
+        // console.log(`Entry: ${entry.path}`);
         if (entry.children) {
           processEntries(entry.children);
         }
@@ -74,23 +77,30 @@ export function MarkdownProvider({ children }) {
     }
   };
 
-  const createFile = async () => {
+  const createFile = async (fileName) => {
     try {
       // create new file called "newFile.md"
-      const filePath = appDocuments + "/markdown/newFile.md";
-      const content = "# New File";
+      const filePath = appDocuments + "/markdown/" + fileName + ".md";
+      const content = "# " + fileName;
       await fs.writeFile(filePath, content);
       //select as path
       setFilePath(filePath);
-      getDirectories();
+      getLocalDirectories();
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    getDirectories();
+    getLocalDirectories();
   }, [appDocuments]);
+
+  useEffect(() => {
+    console.log("Checked Notes");
+    if (polybase_notes) {
+      console.log("Notes: ", polybase_notes);
+    }
+  }, [polybase_notes]);
 
   return (
     <MarkdownContext.Provider

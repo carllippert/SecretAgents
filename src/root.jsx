@@ -1,10 +1,12 @@
+import { useEffect } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { useAuth } from "@polybase/react";
-import { Auth } from "@polybase/auth";
-import { useEffect } from "react";
+// import { Auth } from "@polybase/auth";
+
+// const auth = new Auth();
 
 export default function Root() {
-  // const { auth, state, loading } = useAuth();
+  const { auth, state, loading } = useAuth();
 
   // const signIn = async () => {
   //   const authState = await auth.signIn();
@@ -13,10 +15,29 @@ export default function Root() {
 
   // useEffect(() => {
   //   console.log("state", state);
-  //   if (!state) {
-  //     signIn();
-  //   }
-  // }, []);
+  //   // if (!state) {
+  //   //   signIn();
+  //   // }
+  // }, [state]);
+
+  useEffect(() => {
+    // Add the auth.onAuthUpdate event listener
+    const unsubscribe = auth.onAuthUpdate((authState) => {
+      if (authState) {
+        // User is logged in, show button to dashboard
+        // Do something here to handle the logged-in state
+        console.log("authState", authState);
+      } else {
+        console.log("No Auth State");
+        // auth.signIn();
+        // User is NOT logged in, show login button
+        // Do something here to handle the logged-out state
+      }
+    });
+
+    // Clean up the event listener on component unmount
+    return () => unsubscribe();
+  }, []);
 
   // if (!state) {
   //   //no auth state

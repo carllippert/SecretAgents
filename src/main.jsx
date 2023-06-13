@@ -12,6 +12,7 @@ import { MarkdownProvider } from "./context/MarkdownProvider";
 import "./styles.css";
 import { MessagingProvider } from "./context/MessagingProvider";
 import { PolybaseProvider, AuthProvider } from "@polybase/react";
+import { ethPersonalSign } from "@polybase/eth";
 
 import { Polybase } from "@polybase/client";
 import { Auth } from "@polybase/auth";
@@ -22,13 +23,12 @@ const privateKey = import.meta.env.REACT_APP_ETHEREUM_PRIVATE_KEY;
 
 const polybase = new Polybase({
   defaultNamespace,
-});
-
-polybase.signer((data) => {
-  return {
-    h: "eth-personal-sign",
-    sig: ethPersonalSign(wallet.privateKey(), data),
-  };
+  signer: (data) => {
+    return {
+      h: "eth-personal-sign",
+      sig: ethPersonalSign(privateKey, data),
+    };
+  },
 });
 
 const auth = new Auth();
