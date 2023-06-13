@@ -7,10 +7,9 @@ import { invoke } from "@tauri-apps/api";
 import { listen } from "@tauri-apps/api/event";
 import { appWindow } from "@tauri-apps/api/window";
 import tauriConfJson from "../../src-tauri/tauri.conf.json";
+import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 import { useTauriContext } from "./TauriProvider";
-
-export const APP_NAME = tauriConfJson.package.productName;
-export const RUNNING_IN_TAURI = window.__TAURI__ !== undefined;
+import { usePolybase, useDocument } from "@polybase/react";
 
 // NOTE: Add cacheable Tauri calls in this file
 //   that you want to use synchronously across components in your app
@@ -27,8 +26,12 @@ const MarkdownContext = React.createContext({
 
 export const useMarkdownContext = () => useContext(MarkdownContext);
 export function MarkdownProvider({ children }) {
-  const { fileSep, loading, documents, downloads, appDocuments } =
-    useTauriContext();
+  const { fileSep, documents, downloads, appDocuments } = useTauriContext();
+
+  const polybase = usePolybase();
+  const { data, error, loading } = useDocument(
+    polybase.collection("users").record("id")
+  );
 
   const [filePathString, setFilePathString] = useState("");
   const [fileContent, setFileContent] = useState("");

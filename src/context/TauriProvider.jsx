@@ -5,10 +5,8 @@ import * as os from "@tauri-apps/api/os";
 import { invoke } from "@tauri-apps/api";
 import { listen } from "@tauri-apps/api/event";
 import { appWindow } from "@tauri-apps/api/window";
-import tauriConfJson from "../../src-tauri/tauri.conf.json";
 
-export const APP_NAME = tauriConfJson.package.productName;
-export const RUNNING_IN_TAURI = window.__TAURI__ !== undefined;
+import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 
 // NOTE: Add cacheable Tauri calls in this file
 //   that you want to use synchronously across components in your app

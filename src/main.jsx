@@ -10,6 +10,28 @@ import Messaging from "./routes/messaging";
 import { TauriProvider } from "./context/TauriProvider";
 import { MarkdownProvider } from "./context/MarkdownProvider";
 import "./styles.css";
+import { MessagingProvider } from "./context/MessagingProvider";
+import { PolybaseProvider, AuthProvider } from "@polybase/react";
+
+import { Polybase } from "@polybase/client";
+import { Auth } from "@polybase/auth";
+import { APP_NAME } from "./utils";
+
+const defaultNamespace = import.meta.env.REACT_APP_POLYBASE_NAMESPACE;
+const privateKey = import.meta.env.REACT_APP_ETHEREUM_PRIVATE_KEY;
+
+const polybase = new Polybase({
+  defaultNamespace,
+});
+
+polybase.signer((data) => {
+  return {
+    h: "eth-personal-sign",
+    sig: ethPersonalSign(wallet.privateKey(), data),
+  };
+});
+
+const auth = new Auth();
 
 const router = createBrowserRouter([
   {
@@ -40,9 +62,15 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <TauriProvider>
-      <MarkdownProvider>
-        <RouterProvider router={router} />
-      </MarkdownProvider>
+      <PolybaseProvider polybase={polybase}>
+        <AuthProvider auth={auth} polybase={polybase}>
+          <MessagingProvider>
+            <MarkdownProvider>
+              <RouterProvider router={router} />
+            </MarkdownProvider>
+          </MessagingProvider>
+        </AuthProvider>
+      </PolybaseProvider>
     </TauriProvider>
   </React.StrictMode>
 );
