@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { IoMdSend } from "react-icons/io";
 import Message from "./message";
 import Container from "./container";
+import { useLangchainContext } from "../context/LangchainProvider";
 
 const Messages = () => {
   const messagesEndRef = useRef(null);
   const [message, setMessage] = useState("");
+  const { callModel } = useLangchainContext();
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -61,6 +63,7 @@ const Messages = () => {
     <div className=" p-2 pt-8 bg-gray-900 overflow-y-auto scroll-container flex flex-col w-full h-full">
       {/* Chat */}
       {/* <Container> */}
+      <button onClick={callModel}>Start Chat</button>
       {messages.length > 0 ? (
         <>
           {messages.map((message) => (

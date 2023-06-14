@@ -34,21 +34,14 @@
       },
       "shell": {
         "all": false,
-        "open": true,
-        "sidecar": true,
-        "scope": [
-          {
-            "name": "bin/python/test",
-            "sidecar": true
-          }
-        ]
+        "open": true
       }
     },
     "bundle": {
       "active": true,
       "targets": "all",
       "identifier": "com.tauri.dev",
-      "externalBin": ["bin/python/test"],
+
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",

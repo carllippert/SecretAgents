@@ -30,11 +30,11 @@ export function MarkdownProvider({ children }) {
 
   const polybase = usePolybase();
 
-  const {
-    data: polybase_notes,
-    error,
-    loading,
-  } = useCollection(polybase.collection("Note"));
+  // const {
+  //   data: polybase_notes,
+  //   error,
+  //   loading,
+  // } = useCollection(polybase.collection("Note"));
 
   const [filePathString, setFilePathString] = useState("");
   const [fileContent, setFileContent] = useState("");
@@ -108,12 +108,12 @@ export function MarkdownProvider({ children }) {
     getLocalDirectories();
   }, [appDocuments]);
 
-  useEffect(() => {
-    console.log("Checked Notes");
-    if (polybase_notes) {
-      console.log("Notes: ", polybase_notes);
-    }
-  }, [polybase_notes]);
+  // useEffect(() => {
+  //   console.log("Checked Notes");
+  //   if (polybase_notes) {
+  //     console.log("Notes: ", polybase_notes);
+  //   }
+  // }, [polybase_notes]);
 
   return (
     <MarkdownContext.Provider

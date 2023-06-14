@@ -6,9 +6,14 @@ export default function TestPythonSideCar() {
   const [greeting, setGreeting] = useState("");
 
   async function greet() {
+    console.log("testing python => ");
     const command = Command.sidecar("bin/python/test");
     const output = await command.execute();
     const { stdout, stderr } = output;
+
+    if (stderr) {
+      console.error("Python Error: ", stderr);
+    }
 
     setGreeting(stdout);
   }

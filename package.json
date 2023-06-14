@@ -5,11 +5,15 @@
   "type": "module",
   "scripts": {
     "start": "tauri dev",
-    "dev": "pnpm build_py_macos && vite",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "build_py_macos": "pyinstaller -F py/test.py --distpath src-tauri/bin/python --clean -n test-x86_64-apple-darwin"
+    "build_py_macos3": "pyinstaller --add-data \"py/langchain/chains/llm_summarization_checker/prompts/create_facts.txt:py/langchain/chains/llm_summarization_checker/prompts/\" --onefile py/test.py --distpath src-tauri/bin/python --clean -n test-x86_64-apple-darwin",
+    "build_py_macos": "source py/.venv/bin/activate && pip freeze && echo $PYTHONPATH && yes | pyinstaller --hidden-import pydantic --add-data \"py/.venv/lib/python3.11/site-packages/langchain/chains/llm_summarization_checker/prompts/create_facts.txt:py/.venv/lib/python3.11/site-packages/langchain/chains/llm_summarization_checker/prompts/\" --additional-hooks-dir=py/hooks  --distpath src-tauri/bin/python --clean -n test-x86_64-apple-darwin py/test.py",
+    "build_py_macos2": "source py/.venv/bin/activate && pip freeze && echo $PYTHONPATH && yes | pyinstaller --onefile --add-data \"py/.venv/lib/python3.11/site-packages/langchain/chains/llm_summarization_checker/prompts/create_facts.txt\" --additional-hooks-dir=py/hooks  --distpath src-tauri/bin/python --clean -n test-x86_64-apple-darwin py/test.py",
+    "oxidize": "source py/.venv/bin/activate && cd py && pyoxidizer build",
+    "build_macos_simple": "cd py && source .venv/bin/activate && yes | pyinstaller --distpath ../src-tauri/bin/python --clean -n test-x86_64-apple-darwin test.py"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.5.1",
@@ -19,6 +23,7 @@
     "@polybase/react": "^0.6.2",
     "@tauri-apps/api": "^1.3.0",
     "clsx": "^1.2.1",
+    "langchain": "^0.0.95",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "react": "^18.2.0",
