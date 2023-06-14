@@ -16,18 +16,39 @@ import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 
 // defaults are only for auto-complete
 const MessagingContext = React.createContext({
-  filePath: undefined,
-  fileContent: undefined,
-  setFilePath: undefined,
-  updateFile: undefined,
-  createFile: undefined,
-  markdownPaths: [],
+  chats: [],
+  currentChat: undefined,
+  setCurrentChat: undefined,
 });
 
 export const useMessagingContext = () => useContext(MessagingContext);
 export function MessagingProvider({ children }) {
   const { fileSep, loading, documents, downloads, appDocuments } =
     useTauriContext();
+  const [currentChat, setCurrentChat] = useState(0);
+  // Zero will be special. will use for agent.
+  const [chats, setChats] = useState([
+    {
+      id: 1,
+      title: "Chat 1",
+      message: "Last message in Chat 1...",
+    },
+    {
+      id: 2,
+      title: "Chat 2",
+      message: "Last message in Chat 2...",
+    },
+    {
+      id: 3,
+      title: "Chat 3",
+      message: "Last message in Chat 3...",
+    },
+    {
+      id: 4,
+      title: "Chat 4",
+      message: "Last message in Chat 4...",
+    },
+  ]);
 
   // const startChat = async () => {
   //   const chat = await main();
@@ -40,16 +61,17 @@ export function MessagingProvider({ children }) {
 
   return (
     <MessagingContext.Provider
-      value={
-        {
-          // filePath: filePathString,
-          // setFilePath,
-          // markdownPaths,
-          // fileContent,
-          // updateFile,
-          // createFile,
-        }
-      }
+      value={{
+        chats,
+        currentChat,
+        setCurrentChat,
+        // filePath: filePathString,
+        // setFilePath,
+        // markdownPaths,
+        // fileContent,
+        // updateFile,
+        // createFile,
+      }}
     >
       {children}
     </MessagingContext.Provider>

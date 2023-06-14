@@ -34,6 +34,7 @@ const OPEN_AI_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 // defaults are only for auto-complete
 const LangchainContext = React.createContext({
   callModel: undefined,
+  chat: undefined,
 });
 
 // const chat = new ChatOpenAI({ openAIApiKey: OPEN_AI_KEY, temperature: 0 });
@@ -48,6 +49,7 @@ export function LangchainProvider({ children }) {
     useTauriContext();
 
   const { markdownPaths } = useMarkdownContext();
+  let chat = undefined;
 
   // const callModel = async () => {
   //   console.log("openaikey => ", import.meta.env.VITE_OPENAI_API_KEY);
@@ -74,7 +76,8 @@ export function LangchainProvider({ children }) {
 
     const { textsArray, metadataArray } = await getFileContent();
     const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
+      chunkSize: 100,
+      chunkOverlap: 20,
     });
     const docs = await textSplitter.createDocuments(textsArray, metadataArray);
     /* Create the vectorstore */
@@ -83,7 +86,7 @@ export function LangchainProvider({ children }) {
       new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
     );
     /* Create the chain */
-    const chain = ConversationalRetrievalQAChain.fromLLM(
+    chat = ConversationalRetrievalQAChain.fromLLM(
       model,
       vectorStore.asRetriever(),
       {
@@ -93,14 +96,14 @@ export function LangchainProvider({ children }) {
       }
     );
     /* Ask it a question */
-    const question = "What file did we do lots of stuff with Tauri?";
-    const res = await chain.call({ question });
+    const question = "What have i writen about in my notes that you have";
+    const res = await chat.call({ question });
     console.log(res);
     /* Ask it a follow up question */
-    const followUpRes = await chain.call({
-      question: "Was that nice?",
-    });
-    console.log(followUpRes);
+    // const followUpRes = await chain.call({
+    //   question: "Was packages?",
+    // });
+    // console.log(followUpRes);
   };
 
   const getFileContent = async () => {
@@ -118,54 +121,17 @@ export function LangchainProvider({ children }) {
     return { textsArray, metadataArray };
   };
 
-  const run = async () => {
-    // Create docs with a loader
-    // const loader = new TextLoader(
-    //   "src/document_loaders/example_data/example.txt"
-    // );
-    // const docs = await loader.load();
-    let textsArray = [];
-    let metadataArray = [];
-
-    markdownPaths.forEach(async (path) => {
-      console.log("path in Langchain", path);
-      let content = await readTextFile(path.path);
-      console.log("content", content);
-      textsArray.push(content);
-      metadataArray.push({ type: "note", ...path });
-    });
-
-    const vectorStore = await MemoryVectorStore.fromTexts(
-      textsArray,
-      metadataArray,
-      new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
-    );
-
-    // Load the docs into the vector store
-    // const vectorStore = await MemoryVectorStore.fromDocuments(
-    //   docs,
-    //   new OpenAIEmbeddings()
-    // );
-
-    // Search for the most similar document
-    const resultOne = await vectorStore.similaritySearch("hackfs", 1);
-
-    console.log("result from vector", resultOne);
-  };
-
-  // const startChat = async () => {
-  //   const chat = await main();
-  //   console.log(chat);
-  // };
-
-  useEffect(() => {
-    runChat();
-  }, []);
+  // useEffect(() => {
+  //   if (markdownPaths) {
+  //     runChat();
+  //   }
+  // }, [markdownPaths]);
 
   return (
     <LangchainContext.Provider
       value={{
         callModel: runChat,
+        chat,
         // filePath: filePathString,
         // setFilePath,
         // markdownPaths,

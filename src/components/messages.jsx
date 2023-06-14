@@ -7,11 +7,12 @@ import { useLangchainContext } from "../context/LangchainProvider";
 const Messages = () => {
   const messagesEndRef = useRef(null);
   const [message, setMessage] = useState("");
-  const { callModel } = useLangchainContext();
+  const { chat } = useLangchainContext();
   const [messages, setMessages] = useState([
     {
       id: 1,
-      avatar: "https://example.com/avatar1.jpg",
+      avatar:
+        "https://pbs.twimg.com/profile_images/1650519711593947137/0qNyuwSX_400x400.jpg",
       start: "John Doe",
       name: "John Doe",
       time: "9:00 AM",
@@ -22,7 +23,8 @@ const Messages = () => {
     },
     {
       id: 2,
-      avatar: "https://example.com/avatar2.jpg",
+      avatar:
+        "https://pbs.twimg.com/profile_images/1650519711593947137/0qNyuwSX_400x400.jpg",
       start: "Jane Smith",
       name: "Jane Smith",
       time: "10:30 AM",
@@ -34,7 +36,8 @@ const Messages = () => {
     // Add more message objects here...
     {
       id: 5,
-      avatar: "https://example.com/avatar5.jpg",
+      avatar:
+        "https://pbs.twimg.com/profile_images/1650519711593947137/0qNyuwSX_400x400.jpg",
       start: "David Johnson",
       name: "David Johnson",
       time: "3:45 PM",
@@ -63,7 +66,7 @@ const Messages = () => {
     <div className=" p-2 pt-8 bg-gray-900 overflow-y-auto scroll-container flex flex-col w-full h-full">
       {/* Chat */}
       {/* <Container> */}
-      <button onClick={callModel}>Start Chat</button>
+      {/* <button onClick={callModel}>Start Chat</button> */}
       {messages.length > 0 ? (
         <>
           {messages.map((message) => (

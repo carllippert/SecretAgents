@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 import LeftPanel from "../components/leftPanel";
 import Messages from "../components/messages";
+import { useMessagingContext } from "../context/MessagingProvider";
+import clsx from "clsx";
 
 export default function Messaging() {
+  const { chats, currentChat, setCurrentChat } = useMessagingContext();
+
   return (
     <div className="flex flex-row h-full w-full">
       <LeftPanel>
@@ -13,27 +17,47 @@ export default function Messaging() {
           </div>
           <div className="flex-grow overflow-y-auto">
             <ul className="py-2">
-              <li className="flex items-center px-4 py-3 border-b border-gray-700">
+              <li
+                key={0}
+                onClick={() => {
+                  setCurrentChat(0);
+                }}
+                className={clsx(
+                  "flex items-center px-4 py-3 border-b border-gray-700",
+                  {
+                    "bg-gray-700": 0 === currentChat,
+                  }
+                )}
+              >
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-500"></div>
                 <div className="flex-grow ml-4">
-                  <h3 className="text-lg font-semibold">Chat 1</h3>
-                  <p className="text-gray-500">Last message...</p>
+                  <h3 className="text-lg font-semibold">Secret Agent</h3>
+                  <p className="text-gray-500">Hey whats up?</p>
                 </div>
               </li>
-              <li className="flex items-center px-4 py-3 border-b border-gray-700">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-500"></div>
-                <div className="flex-grow ml-4">
-                  <h3 className="text-lg font-semibold">Chat 2</h3>
-                  <p className="text-gray-500">Last message...</p>
-                </div>
-              </li>
-              <li className="flex items-center px-4 py-3 border-b border-gray-700">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-500"></div>
-                <div className="flex-grow ml-4">
-                  <h3 className="text-lg font-semibold">Chat 3</h3>
-                  <p className="text-gray-500">Last message...</p>
-                </div>
-              </li>
+              {chats.map((chat) => (
+                <li
+                  key={chat.id}
+                  onClick={() => {
+                    setCurrentChat(chat.id);
+                  }}
+                  // className={clsx("px-4 py-2 flex items-center", {
+                  //   "bg-gray-700": filePath === file.path,
+                  // })}
+                  className={clsx(
+                    "flex items-center px-4 py-3 border-b border-gray-700",
+                    {
+                      "bg-gray-700": chat.id === currentChat,
+                    }
+                  )}
+                >
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-500"></div>
+                  <div className="flex-grow ml-4">
+                    <h3 className="text-lg font-semibold">{chat.title}</h3>
+                    <p className="text-gray-500">{chat.message}</p>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
