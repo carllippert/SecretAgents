@@ -3,50 +3,13 @@ import { IoMdSend } from "react-icons/io";
 import Message from "./message";
 import Container from "./container";
 import { useLangchainContext } from "../context/LangchainProvider";
+import { useMessagingContext } from "../context/MessagingProvider";
 
 const Messages = () => {
   const messagesEndRef = useRef(null);
   const [message, setMessage] = useState("");
-  const { chat } = useLangchainContext();
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      avatar:
-        "https://pbs.twimg.com/profile_images/1650519711593947137/0qNyuwSX_400x400.jpg",
-      start: "John Doe",
-      name: "John Doe",
-      time: "9:00 AM",
-      message: "Hello, how are you?",
-      status: "sent",
-      show_status: true,
-      receipt: true,
-    },
-    {
-      id: 2,
-      avatar:
-        "https://pbs.twimg.com/profile_images/1650519711593947137/0qNyuwSX_400x400.jpg",
-      start: "Jane Smith",
-      name: "Jane Smith",
-      time: "10:30 AM",
-      message: "I am doing great!",
-      status: "received",
-      show_status: true,
-      receipt: false,
-    },
-    // Add more message objects here...
-    {
-      id: 5,
-      avatar:
-        "https://pbs.twimg.com/profile_images/1650519711593947137/0qNyuwSX_400x400.jpg",
-      start: "David Johnson",
-      name: "David Johnson",
-      time: "3:45 PM",
-      message: "See you tomorrow!",
-      status: "sent",
-      show_status: true,
-      receipt: true,
-    },
-  ]);
+  // const { chatChain  } = useLangchainContext();
+  const { sendMessage, messages } = useMessagingContext();
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -58,8 +21,9 @@ const Messages = () => {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async () => {
-    console.log("Send Message", message);
+  const send = async () => {
+    console.log("Sending message from input form", message);
+    sendMessage(message);
   };
 
   return (
@@ -79,8 +43,8 @@ const Messages = () => {
               message={message.message}
               status={message.status}
               show_status={message.show_status}
-              receipt={message.receipt}
-              setMessages={setMessages}
+              // receipt={message.receipt}
+              // setMessages={setMessages}
             />
           ))}
           <div ref={messagesEndRef} />
@@ -94,10 +58,11 @@ const Messages = () => {
               onChange={(e) => {
                 setMessage(e.target.value);
               }}
+              value={message}
               placeholder="Type here"
               className="input input-bordered rounded-2xl h-10 w-full"
             />
-            <button className=" ml-1" onClick={sendMessage}>
+            <button className=" ml-1" onClick={send}>
               <IoMdSend className="w-10 h-10 text-gray-500" />
             </button>
           </div>

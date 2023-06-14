@@ -34,7 +34,7 @@ const OPEN_AI_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 // defaults are only for auto-complete
 const LangchainContext = React.createContext({
   callModel: undefined,
-  chat: undefined,
+  // chatChain: undefined,
 });
 
 // const chat = new ChatOpenAI({ openAIApiKey: OPEN_AI_KEY, temperature: 0 });
@@ -49,7 +49,6 @@ export function LangchainProvider({ children }) {
     useTauriContext();
 
   const { markdownPaths } = useMarkdownContext();
-  let chat = undefined;
 
   // const callModel = async () => {
   //   console.log("openaikey => ", import.meta.env.VITE_OPENAI_API_KEY);
@@ -67,7 +66,9 @@ export function LangchainProvider({ children }) {
   //   console.log(res);
   // };
 
-  const runChat = async () => {
+  // const sendAgentMessage = async (message) => {
+
+  const runChat = async (message) => {
     /* Initialize the LLM to use to answer the question */
     // const model = new OpenAI({});
     /* Load in the file we want to do question answering over */
@@ -85,8 +86,9 @@ export function LangchainProvider({ children }) {
       docs,
       new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
     );
+
     /* Create the chain */
-    chat = ConversationalRetrievalQAChain.fromLLM(
+    let chat = ConversationalRetrievalQAChain.fromLLM(
       model,
       vectorStore.asRetriever(),
       {
@@ -95,10 +97,13 @@ export function LangchainProvider({ children }) {
         }),
       }
     );
+
+    console.log("Set up chatChain in langchain");
     /* Ask it a question */
-    const question = "What have i writen about in my notes that you have";
-    const res = await chat.call({ question });
-    console.log(res);
+    // const question = "What have i writen about in my notes that you have";
+    const res = await chat.call({ question: message });
+    return res;
+    // console.log(res);
     /* Ask it a follow up question */
     // const followUpRes = await chain.call({
     //   question: "Was packages?",
@@ -121,17 +126,17 @@ export function LangchainProvider({ children }) {
     return { textsArray, metadataArray };
   };
 
-  // useEffect(() => {
-  //   if (markdownPaths) {
-  //     runChat();
-  //   }
-  // }, [markdownPaths]);
+  useEffect(() => {
+    if (markdownPaths) {
+      runChat();
+    }
+  }, [markdownPaths]);
 
   return (
     <LangchainContext.Provider
       value={{
         callModel: runChat,
-        chat,
+        // chatChain,
         // filePath: filePathString,
         // setFilePath,
         // markdownPaths,
