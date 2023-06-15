@@ -78,10 +78,11 @@ const Messages = () => {
               onChange={(e) => {
                 setMessage(e.target.value);
               }}
+              value={message}
               placeholder="Type here"
-              className="input input-bordered rounded-2xl h-10 w-full max-w-xs"
+              className="input input-bordered rounded-2xl h-10 w-full"
             />
-            <button className=" ml-1" onClick={sendMessage}>
+            <button className=" ml-1" onClick={send}>
               <IoMdSend className="w-10 h-10 text-gray-500" />
             </button>
           </div>

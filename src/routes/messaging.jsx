@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 import LeftPanel from "../components/leftPanel";
 import Messages from "../components/messages";
-import { useMessagingContext } from "../context/MessagingProvider";
+import {
+  AGENT_AVATAR,
+  useMessagingContext,
+} from "../context/MessagingProvider";
 import clsx from "clsx";
 
 export default function Messaging() {
@@ -29,7 +32,15 @@ export default function Messaging() {
                   }
                 )}
               >
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-500"></div>
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12">
+                    <img
+                      className="object-cover w-full h-full rounded-full"
+                      src={AGENT_AVATAR}
+                      alt="User Avatar"
+                    />
+                  </div>
+                </div>
                 <div className="flex-grow ml-4">
                   <h3 className="text-lg font-semibold">Secret Agent</h3>
                   <p className="text-gray-500">Hey whats up?</p>
@@ -51,7 +62,16 @@ export default function Messaging() {
                     }
                   )}
                 >
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-500"></div>
+                  {/* <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-500"></div> */}
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12">
+                      <img
+                        className="object-cover w-full h-full rounded-full"
+                        src={chat.avatar}
+                        alt="User Avatar"
+                      />
+                    </div>
+                  </div>
                   <div className="flex-grow ml-4">
                     <h3 className="text-lg font-semibold">{chat.title}</h3>
                     <p className="text-gray-500">{chat.message}</p>
