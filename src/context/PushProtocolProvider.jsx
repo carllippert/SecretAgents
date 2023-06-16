@@ -18,8 +18,6 @@ const PUBKEY = import.meta.env.VITE_ETHEREUM_PUBLIC_KEY;
 const Pkey = "0x" + PK;
 const signer = new ethers.Wallet(Pkey);
 const ACCOUNT = `eip155:${PUBKEY}`;
-// NOTE: Add cacheable Tauri calls in this file
-//   that you want to use synchronously across components in your app
 
 // defaults are only for auto-complete
 const PushProtocolContext = React.createContext({});
@@ -28,14 +26,17 @@ export const usePushProtocolContext = () => useContext(PushProtocolContext);
 export function PushProtocolProvider({ children }) {
   const { fileSep, documents, downloads, appDocuments } = useTauriContext();
   const [pushProtocolUser, setPushProtocolUser] = useState(null);
+  const [decryptedPGPKey, setDecryptedPGPKey] = useState(null);
 
   const getUser = async () => {
     try {
-      // const user = await PushAPI.user.get({
-      //   env: "staging",
-      //   account: ACCOUNT,
-      // });
-      // setPushProtocolUser(user);
+      const user = await PushAPI.user.get({
+        env: "staging",
+        account: ACCOUNT,
+      });
+      console.log("Got Push User", user);
+      setPushProtocolUser(user);
+      return user;
     } catch (e) {
       setPushProtocolUser(null);
       console.log(e);
@@ -45,19 +46,22 @@ export function PushProtocolProvider({ children }) {
   const decryptUserPGP = async () => {
     try {
       console.log("Hit Decrypt");
-      // const response = await PushAPI.chat.decryptPGPKey({
-      //   // encryptedPGPPrivateKey: string;
-      //   // account?: string;
-      //   // signer?: SignerType;
-      //   // additionalMeta?: {
-      //   //   NFTPGP_V1?: {
-      //   //     password: string;
-      //   //   };
-      //   // };
-      //   // env?: ENV;
-      //   // toUpgrade?: boolean;
-      //   // progressHook?: (progress: ProgressHookType) => void;
-      // });
+      console.log(
+        "Push User in Decrypt",
+        JSON.stringify(pushProtocolUser, null, 3)
+      );
+      //response type
+      //https://docs.push.org/developers/developer-tooling/push-sdk/sdk-packages-details/epnsproject-sdk-restapi/for-chat/initializing-user#response
+      const response = await PushAPI.chat.decryptPGPKey({
+        encryptedPGPPrivateKey: pushProtocolUser?.encryptedPrivateKey,
+        account: ACCOUNT,
+        signer: signer,
+
+        env: "staging",
+      });
+
+      console.log("Decrypted PGP Key", response);
+      setDecryptedPGPKey(response);
     } catch (e) {
       console.log(e);
     }
@@ -66,12 +70,13 @@ export function PushProtocolProvider({ children }) {
   const createUser = async () => {
     try {
       if (!pushProtocolUser) {
-        // const user = await PushAPI.user.create({
-        //   env: "staging",
-        //   account: ACCOUNT,
-        //   signer: signer,
-        // });
-        // setPushProtocolUser(user);
+        const user = await PushAPI.user.create({
+          env: "staging",
+          account: ACCOUNT,
+          signer: signer,
+        });
+        console.log("Created New Push User", user);
+        setPushProtocolUser(user);
       } else {
         throw new Error("User already exists, Don't create. ");
       }
@@ -84,6 +89,7 @@ export function PushProtocolProvider({ children }) {
   const initialize = async () => {
     //GET USER
     let res = await getUser();
+
     if (res) {
       //IF USER EXISTS
     } else {
