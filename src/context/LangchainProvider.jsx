@@ -32,12 +32,15 @@ const OPEN_AI_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 // defaults are only for auto-complete
 const LangchainContext = React.createContext({
   callModel: undefined,
-  callVector: undefined,
   runChain: undefined,
   addDocuments: undefined,
+  modelState: undefined,
 });
 
 let vectorStore = null;
+let chain = null;
+
+const model = new OpenAI({ openAIApiKey: OPEN_AI_KEY, temperature: 0.9 });
 
 const initVectorStore = async (texts, metadatas) => {
   vectorStore = new MemoryVectorStore(
@@ -45,7 +48,17 @@ const initVectorStore = async (texts, metadatas) => {
   );
 };
 
-const model = new OpenAI({ openAIApiKey: OPEN_AI_KEY, temperature: 0.9 });
+const initChain = async () => {
+  chain = ConversationalRetrievalQAChain.fromLLM(
+    model,
+    vectorStore.asRetriever(),
+    {
+      memory: new BufferMemory({
+        memoryKey: "chat_history", // Must be set to "chat_history"
+      }),
+    }
+  );
+};
 
 export const useLangchainContext = () => useContext(LangchainContext);
 export function LangchainProvider({ children }) {
@@ -55,6 +68,7 @@ export function LangchainProvider({ children }) {
   const [messagePaths, setMessagePaths] = useState([]);
   const [documentsAdded, setDocumentsAdded] = useState(false);
   const [loadingDocuments, setLoadingDocuments] = useState(false);
+  const [modelState, setModelState] = useState("");
 
   const getLocalMarkdownDirectories = async () => {
     try {
@@ -132,58 +146,16 @@ export function LangchainProvider({ children }) {
     return { textsArray, metadataArray };
   };
 
-  const callVector = async () => {
-    const { textsArray, metadataArray } = await getMarkdownFileContent();
-
-    const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
-      chunkSize: 32,
-      chunkOverlap: 0,
-    });
-
-    const mdOutput = await splitter.createDocuments(textsArray, metadataArray);
-
-    console.log("mdOutput", mdOutput);
-
-    const vectorStore = await MemoryVectorStore.fromTexts(
-      ["Hello world", "Bye bye", "hello nice world"],
-      [{ id: 2 }, { id: 1 }, { id: 3 }],
-      new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
-    );
-
-    const resultOne = await vectorStore.similaritySearch("hello world", 1);
-    console.log(resultOne);
-  };
-
   const runChain = async (message) => {
-    // const { textsArray, metadataArray } = await getMarkdownFileContent();
-
-    // console.log("textsArray", textsArray);
-    // console.log("metadataArray", metadataArray);
-
-    // const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
-    //   chunkSize: 32,
-    //   chunkOverlap: 0,
-    // });
-
-    // const mdOutput = await splitter.createDocuments(textsArray, metadataArray);
-    // console.log("mdOutput", mdOutput);
-    //TODO: how to persist vectors?
-    /* Create the vectorstore */
-    // const vectorStore = await MemoryVectorStore.fromDocuments(
-    //   mdOutput,
-    //   new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
+    // const chain = ConversationalRetrievalQAChain.fromLLM(
+    //   model,
+    //   vectorStore.asRetriever(),
+    //   {
+    //     memory: new BufferMemory({
+    //       memoryKey: "chat_history", // Must be set to "chat_history"
+    //     }),
+    //   }
     // );
-    // await vectorStore.addDocuments(mdOutput);
-    /* Create the chain */
-    const chain = ConversationalRetrievalQAChain.fromLLM(
-      model,
-      vectorStore.asRetriever(),
-      {
-        memory: new BufferMemory({
-          memoryKey: "chat_history", // Must be set to "chat_history"
-        }),
-      }
-    );
     /* Ask it a question */
     // const question = "What did carl say about the bird?";
     const res = await chain.call({ question: message });
@@ -193,6 +165,7 @@ export function LangchainProvider({ children }) {
   const addDocuments = async (textsArray, metadataArray) => {
     try {
       setLoadingDocuments(true);
+      setModelState("Updating Model ...");
 
       const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
         chunkSize: 32,
@@ -215,6 +188,7 @@ export function LangchainProvider({ children }) {
     } catch (e) {
       console.log(e);
     } finally {
+      setModelState("");
       setLoadingDocuments(false);
     }
   };
@@ -231,6 +205,10 @@ export function LangchainProvider({ children }) {
 
       await addDocuments(textsArray, metadataArray);
     }
+    if (!chain) {
+      console.log("initing chain");
+      await initChain();
+    }
   };
 
   useEffect(() => {
@@ -246,9 +224,9 @@ export function LangchainProvider({ children }) {
     <LangchainContext.Provider
       value={{
         callModel: runChain,
-        callVector,
         runChain,
         addDocuments,
+        modelState,
       }}
     >
       {children}

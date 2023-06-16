@@ -8,7 +8,7 @@ export default function TestFileAccess() {
     useTauriContext();
 
   const [markdownFiles, setMarkdownFiles] = useState([]);
-  const { callVector, runChain } = useLangchainContext();
+  const { runChain } = useLangchainContext();
 
   const getDir = async () => {
     try {
@@ -33,9 +33,9 @@ export default function TestFileAccess() {
   return (
     <div className="bg-base-100 w-full h-full">
       <div>File Access</div>
-      <button className="btn btn-success" onClick={callVector}>
+      {/* <button className="btn btn-success" onClick={callVector}>
         Click To Call Vector
-      </button>
+      </button> */}
       <br />
       <br />
       <button className="btn btn-success" onClick={runChain}>

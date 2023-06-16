@@ -16,7 +16,7 @@ export default function Notes() {
 
   //from GPT
   useEffect(() => {
-    const delay = 2000; // Delay in milliseconds
+    const delay = 1000; // Delay in milliseconds
     let timeoutId;
 
     const debounceInput = () => {
