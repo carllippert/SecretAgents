@@ -11,7 +11,7 @@ import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 import { useTauriContext } from "./TauriProvider";
 import { useLangchainContext } from "./LangchainProvider";
 import { usePolybase, useDocument, useCollection } from "@polybase/react";
-// import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 // NOTE: Add cacheable Tauri calls in this file
 //   that you want to use synchronously across components in your app
 
@@ -31,7 +31,7 @@ export const useFileContext = () => useContext(FileContext);
 export function FileProvider({ children }) {
   const { fileSep, documents, downloads, appDocuments } = useTauriContext();
   const { addDocuments } = useLangchainContext();
-  const polybase = usePolybase();
+  // const polybase = usePolybase();
 
   const [filePathString, setFilePathString] = useState("");
   const [fileContent, setFileContent] = useState("");
@@ -92,9 +92,9 @@ export function FileProvider({ children }) {
       console.log("filename", fileName);
       console.log("content", content);
       console.log("trying to save file to polybase", fileName, content);
-      const note = await polybase
-        .collection("Note")
-        .create([fileName, content]);
+      // const note = await polybase.collection("User").create([`12`]);
+      // .createFile([uuidv4(), fileName, content]);
+      // .create([uuidv4(), fileName, content]);
 
       console.log("Note Saved: ", note);
     } catch (error) {

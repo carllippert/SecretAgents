@@ -20,13 +20,16 @@ const signer = new ethers.Wallet(Pkey);
 const ACCOUNT = `eip155:${PUBKEY}`;
 
 // defaults are only for auto-complete
-const PushProtocolContext = React.createContext({});
+const PushProtocolContext = React.createContext({
+  chats: [],
+});
 
 export const usePushProtocolContext = () => useContext(PushProtocolContext);
 export function PushProtocolProvider({ children }) {
   const { fileSep, documents, downloads, appDocuments } = useTauriContext();
   const [pushProtocolUser, setPushProtocolUser] = useState(null);
   const [decryptedPGPKey, setDecryptedPGPKey] = useState(null);
+  const [chats, setChats] = useState([]);
 
   const getUser = async () => {
     try {
@@ -62,6 +65,26 @@ export function PushProtocolProvider({ children }) {
 
       console.log("Decrypted PGP Key", response);
       setDecryptedPGPKey(response);
+      await fetchChats();
+      return;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchChats = async () => {
+    console.log("Hit Fetch Chats");
+    try {
+      const response = await PushAPI.chat.chats({
+        env: "staging",
+        account: ACCOUNT,
+        toDecrypt: true,
+        pgpPrivateKey: decryptedPGPKey,
+      });
+
+      console.log("Fetched Chats", response);
+      setChats(response);
+      return;
     } catch (e) {
       console.log(e);
     }
@@ -77,6 +100,7 @@ export function PushProtocolProvider({ children }) {
         });
         console.log("Created New Push User", user);
         setPushProtocolUser(user);
+        return;
       } else {
         throw new Error("User already exists, Don't create. ");
       }
@@ -89,19 +113,24 @@ export function PushProtocolProvider({ children }) {
   const initialize = async () => {
     //GET USER
     let res = await getUser();
-
-    if (res) {
-      //IF USER EXISTS
-    } else {
+    if (!res) {
       //IF USER DOESNT EXIST CREATE
       let res = await createUser();
     }
   };
 
+  // useEffect(() => {
+  //   if (decryptedPGPKey) {
+  //     console.log(decryptedPGPKey);
+  //     fetchChats();
+  //   }
+  // }, [pushProtocolUser]);
+
   useEffect(() => {
     if (pushProtocolUser) {
       console.log(pushProtocolUser);
       decryptUserPGP();
+      // await fetchChats();
     }
   }, [pushProtocolUser]);
 
@@ -110,7 +139,7 @@ export function PushProtocolProvider({ children }) {
   }, []);
 
   return (
-    <PushProtocolContext.Provider value={{}}>
+    <PushProtocolContext.Provider value={{ chats }}>
       {children}
     </PushProtocolContext.Provider>
   );

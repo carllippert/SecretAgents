@@ -14,7 +14,7 @@ export default function Messaging() {
   return (
     <div className="flex flex-row h-full w-full">
       <LeftPanel>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-64 ">
           <div className="p-4 border-b border-gray-700">
             <h2 className="text-white text-2xl font-bold">Chats</h2>
           </div>
