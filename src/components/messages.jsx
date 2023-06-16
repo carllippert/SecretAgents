@@ -3,12 +3,14 @@ import { IoMdSend } from "react-icons/io";
 import Message from "./message";
 
 import { useMessagingContext } from "../context/MessagingProvider";
+import { usePushProtocolContext } from "../context/PushProtocolProvider";
 
 const Messages = () => {
   const messagesEndRef = useRef(null);
   const [message, setMessage] = useState("");
   // const { chatChain  } = useLangchainContext();
-  const { sendMessage, messages } = useMessagingContext();
+  const { sendMessage, messages, currentChat } = useMessagingContext();
+  // const { chats, messages } = usePushProtocolContext();
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -28,12 +30,9 @@ const Messages = () => {
 
   return (
     <div className=" p-2 pt-8 bg-gray-900 overflow-y-auto scroll-container flex flex-col w-full h-full">
-      {/* Chat */}
-      {/* <Container> */}
-      {/* <button onClick={callModel}>Start Chat</button> */}
-      {messages.length > 0 ? (
+      {messages[currentChat] && messages[currentChat].length > 0 ? (
         <>
-          {messages.map((message) => (
+          {messages[currentChat].map((message) => (
             <Message
               key={message.id}
               avatar={message.avatar}

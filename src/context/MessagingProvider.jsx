@@ -36,14 +36,19 @@ export function MessagingProvider({ children }) {
     useTauriContext();
 
   const { callModel } = useLangchainContext();
-  const { chats } = usePushProtocolContext();
+  const {
+    chats,
+    messages: pushMessages,
+    addMessageToCurrentMessagesForChat,
+  } = usePushProtocolContext();
 
   const [currentChat, setCurrentChat] = useState(0);
 
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
 
   const addMessage = async (message) => {
-    setMessages((messages) => [...messages, message]);
+    addMessageToCurrentMessagesForChat(currentChat, message);
+    // setMessages((messages) => [...messages, message]);
   };
 
   const sendAgentMessage = async (messageText) => {
@@ -124,7 +129,7 @@ export function MessagingProvider({ children }) {
         currentChat,
         setCurrentChat,
         sendMessage,
-        messages,
+        messages: pushMessages,
       }}
     >
       {children}

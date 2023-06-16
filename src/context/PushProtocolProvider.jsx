@@ -23,6 +23,7 @@ const ACCOUNT = `eip155:${PUBKEY}`;
 const PushProtocolContext = React.createContext({
   chats: [],
   messages: {}, // { chatId: [messages] }
+  addMessageToCurrentMessagesForChat: undefined,
 });
 
 export const usePushProtocolContext = () => useContext(PushProtocolContext);
@@ -31,6 +32,7 @@ export function PushProtocolProvider({ children }) {
   const [pushProtocolUser, setPushProtocolUser] = useState(null);
   const [decryptedPGPKey, setDecryptedPGPKey] = useState(null);
   const [chats, setChats] = useState([]);
+  const [messages, setMessages] = useState({}); // { chatId: [messages] }
 
   const getUser = async () => {
     try {
@@ -94,6 +96,21 @@ export function PushProtocolProvider({ children }) {
     }
   };
 
+  const replaceCurrentMessagesForChat = (chatId, newMessagesArray) => {
+    console.log("Saving Chat History for ID: ", chatId, newMessagesArray);
+    setMessages((prevData) => ({
+      ...prevData,
+      [chatId]: newMessagesArray,
+    }));
+  };
+
+  const addMessageToCurrentMessagesForChat = (chatId, newMessages) => {
+    setData((prevData) => ({
+      ...prevData,
+      [chatId]: [...prevData[chatId], newValue],
+    }));
+  };
+
   const totalFetch = async (chatId, decryptedKey) => {
     try {
       let args = {
@@ -119,7 +136,14 @@ export function PushProtocolProvider({ children }) {
 
       const chatHistory = await PushAPI.chat.history(nextArgs);
 
-      // console.log("Chat History", chatHistory);
+      console.log("Chat History", chatHistory);
+
+      replaceCurrentMessagesForChat(chatId, chatHistory);
+      // setMessages((prevData) => ({
+      //   ...prevData,
+      //   [chatId]: chatHistory,
+      // }));
+
       return chatHistory;
     } catch (e) {
       console.log("error fetching all chats", e);
@@ -139,6 +163,8 @@ export function PushProtocolProvider({ children }) {
       }
 
       const allChats = await Promise.all(channelFetches);
+
+      console.log("ChatMap", messages);
 
       //TODO: set messages state
 
@@ -190,7 +216,9 @@ export function PushProtocolProvider({ children }) {
   }, []);
 
   return (
-    <PushProtocolContext.Provider value={{ chats }}>
+    <PushProtocolContext.Provider
+      value={{ chats, messages, addMessageToCurrentMessagesForChat }}
+    >
       {children}
     </PushProtocolContext.Provider>
   );
