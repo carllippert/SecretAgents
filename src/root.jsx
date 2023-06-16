@@ -5,6 +5,9 @@ export default function Root() {
   return (
     <div className="flex flex-row min-w-screen min-h-screen overflow-hidden">
       <div className="w-20 bg-base-200 flex flex-col gap-2 p-3">
+        <Link className="btn btn-ghost" to="/files">
+          F
+        </Link>
         <Link className="btn btn-ghost" to="/messaging">
           <AiOutlineMessage className="h-10 w-10" />
         </Link>

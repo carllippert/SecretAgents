@@ -24,6 +24,7 @@ const Messages = () => {
   const send = async () => {
     console.log("Sending message from input form", message);
     sendMessage(message);
+    setMessage("");
   };
 
   return (

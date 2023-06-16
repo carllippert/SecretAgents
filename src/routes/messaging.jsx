@@ -52,9 +52,6 @@ export default function Messaging() {
                   onClick={() => {
                     setCurrentChat(chat.id);
                   }}
-                  // className={clsx("px-4 py-2 flex items-center", {
-                  //   "bg-gray-700": filePath === file.path,
-                  // })}
                   className={clsx(
                     "flex items-center px-4 py-3 border-b border-gray-700",
                     {
@@ -62,7 +59,6 @@ export default function Messaging() {
                     }
                   )}
                 >
-                  {/* <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-500"></div> */}
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12">
                       <img

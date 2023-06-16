@@ -10,7 +10,7 @@ import { OpenAI } from "langchain/llms/openai";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { HumanChatMessage, SystemChatMessage } from "langchain/schema";
 import { useTauriContext } from "./TauriProvider";
-import { useMarkdownContext } from "./MarkdownProvider";
+import { useFileContext } from "./FileProvider";
 import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
@@ -27,68 +27,116 @@ import { ConversationalRetrievalQAChain } from "langchain/chains";
 // import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 // import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { BufferMemory } from "langchain/memory";
-// import * as fs from "fs";
 
 const OPEN_AI_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 // defaults are only for auto-complete
 const LangchainContext = React.createContext({
   callModel: undefined,
-  // chatChain: undefined,
+  callVector: undefined,
+  runChain: undefined,
 });
 
-// const chat = new ChatOpenAI({ openAIApiKey: OPEN_AI_KEY, temperature: 0 });
-const model = new OpenAI({
-  openAIApiKey: OPEN_AI_KEY,
-  temperature: 0.9,
-});
+let vectorStore = null;
+const initVectorStore = async (texts, metadatas) => {
+  vectorStore = new MemoryVectorStore();
+  return;
+};
 
 export const useLangchainContext = () => useContext(LangchainContext);
 export function LangchainProvider({ children }) {
-  const { fileSep, loading, documents, downloads, appDocuments } =
-    useTauriContext();
+  const { markdownPaths, messagePaths } = useFileContext();
 
-  const { markdownPaths } = useMarkdownContext();
+  const getMarkdownFileContent = async () => {
+    if (markdownPaths.length === 0) {
+      console.log("no markdownPaths");
+      return;
+    }
+    let textsArray = [];
+    let metadataArray = [];
 
-  // const callModel = async () => {
-  //   console.log("openaikey => ", import.meta.env.VITE_OPENAI_API_KEY);
-  //   // console.log("private key", privateKey);
-  //   // const model = new OpenAI({
-  //   //   openAIApiKey: OPEN_AI_KEY,
-  //   //   temperature: 0.9,
-  //   // });
+    for (let i = 0; i < markdownPaths.length; i++) {
+      let path = markdownPaths[i];
+      if (path.path.includes(".DS_Store")) {
+        continue;
+      }
+      let content = await readTextFile(path.path);
 
-  //   // runChat();
+      textsArray.push(content);
+      metadataArray.push({ type: "note", ...path });
+    }
 
-  //   const res = await model.call(
-  //     "What would be a good company name a company that makes colorful socks?"
-  //   );
-  //   console.log(res);
-  // };
+    return { textsArray, metadataArray };
+  };
 
-  // const sendAgentMessage = async (message) => {
+  const getMessageFileContent = async () => {
+    if (messagePaths.length === 0) {
+      console.log("no messagePaths");
+      return;
+    }
 
-  const runChat = async (message) => {
-    /* Initialize the LLM to use to answer the question */
-    // const model = new OpenAI({});
-    /* Load in the file we want to do question answering over */
-    // const text = fs.readFileSync("state_of_the_union.txt", "utf8");
-    /* Split the text into chunks */
+    let textsArray = [];
+    let metadataArray = [];
 
-    const { textsArray, metadataArray } = await getFileContent();
-    const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 100,
-      chunkOverlap: 20,
+    for (let i = 0; i < messagePaths.length; i++) {
+      let path = messagePaths[i];
+      if (path.path.includes(".DS_Store")) {
+        continue;
+      }
+      let content = await readTextFile(path.path);
+
+      textsArray.push(content);
+      metadataArray.push({ type: "message", ...path });
+    }
+
+    return { textsArray, metadataArray };
+  };
+
+  const callVector = async () => {
+    const { textsArray, metadataArray } = await getMarkdownFileContent();
+
+    const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
+      chunkSize: 32,
+      chunkOverlap: 0,
     });
-    const docs = await textSplitter.createDocuments(textsArray, metadataArray);
-    /* Create the vectorstore */
-    const vectorStore = await MemoryVectorStore.fromDocuments(
-      docs,
+
+    const mdOutput = await splitter.createDocuments(textsArray, metadataArray);
+
+    console.log("mdOutput", mdOutput);
+
+    const vectorStore = await MemoryVectorStore.fromTexts(
+      ["Hello world", "Bye bye", "hello nice world"],
+      [{ id: 2 }, { id: 1 }, { id: 3 }],
       new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
     );
 
+    const resultOne = await vectorStore.similaritySearch("hello world", 1);
+    console.log(resultOne);
+  };
+
+  const runChain = async (message) => {
+    const model = new OpenAI({ openAIApiKey: OPEN_AI_KEY, temperature: 0.9 });
+
+    const { textsArray, metadataArray } = await getMarkdownFileContent();
+
+    console.log("textsArray", textsArray);
+    console.log("metadataArray", metadataArray);
+
+    const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
+      chunkSize: 32,
+      chunkOverlap: 0,
+    });
+
+    const mdOutput = await splitter.createDocuments(textsArray, metadataArray);
+    console.log("mdOutput", mdOutput);
+    //TODO: how to persist vectors?
+    /* Create the vectorstore */
+    const vectorStore = await MemoryVectorStore.fromDocuments(
+      mdOutput,
+      new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
+    );
     /* Create the chain */
-    let chat = ConversationalRetrievalQAChain.fromLLM(
+    const chain = ConversationalRetrievalQAChain.fromLLM(
       model,
       vectorStore.asRetriever(),
       {
@@ -97,52 +145,36 @@ export function LangchainProvider({ children }) {
         }),
       }
     );
-
-    console.log("Set up chatChain in langchain");
     /* Ask it a question */
-    // const question = "What have i writen about in my notes that you have";
-    const res = await chat.call({ question: message });
-    return res;
-    // console.log(res);
+    // const question = "What did carl say about the bird?";
+    const res = await chain.call({ question: message });
+    console.log("question answer", res);
+    return res.text;
+
     /* Ask it a follow up question */
     // const followUpRes = await chain.call({
-    //   question: "Was packages?",
+    //   question: "Was that nice?",
     // });
     // console.log(followUpRes);
   };
 
-  const getFileContent = async () => {
-    let textsArray = [];
-    let metadataArray = [];
-
-    markdownPaths.forEach(async (path) => {
-      console.log("path in Langchain", path);
-      let content = await readTextFile(path.path);
-      console.log("content", content);
-      textsArray.push(content);
-      metadataArray.push({ type: "note", ...path });
-    });
-
-    return { textsArray, metadataArray };
+  const init = async () => {
+    if (!vectorStore) {
+      // if(markdownPaths.length > 0){
+      initVectorStore();
+      // }
+    }
   };
 
   useEffect(() => {
-    if (markdownPaths) {
-      runChat();
-    }
-  }, [markdownPaths]);
-
+    init();
+  }, []);
   return (
     <LangchainContext.Provider
       value={{
-        callModel: runChat,
-        // chatChain,
-        // filePath: filePathString,
-        // setFilePath,
-        // markdownPaths,
-        // fileContent,
-        // updateFile,
-        // createFile,
+        callModel: runChain,
+        callVector,
+        runChain,
       }}
     >
       {children}

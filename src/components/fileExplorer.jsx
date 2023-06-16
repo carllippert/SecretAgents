@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 // import { readDir } from "@tauri-apps/api/fs";
 import { FaFolder, FaFile } from "react-icons/fa";
 import { AiFillFileAdd } from "react-icons/ai";
-import { useMarkdownContext } from "../context/MarkdownProvider";
+import { useFileContext } from "../context/FileProvider";
 import clsx from "clsx";
 
 const FileExplorer = () => {
   const [newFilePath, setNewFilePath] = useState(undefined);
 
-  const { markdownPaths, setFilePath, filePath, createFile } =
-    useMarkdownContext();
+  const { markdownPaths, setFilePath, filePath, createFile } = useFileContext();
 
   return (
     <div className="flex flex-col text-gray-300 w-64 h-screen">
@@ -39,13 +38,17 @@ const FileExplorer = () => {
             />
             <AiFillFileAdd
               className="h-8 w-8 ml-3"
-              onClick={() => createFile(newFilePath)}
+              onClick={() => {
+                createFile(newFilePath);
+                setNewFilePath("");
+              }}
             />
           </li>
           {markdownPaths.map((file) => {
             // console.log("File", file);
             return (
               <li
+                key={file.path}
                 className={clsx("px-4 py-2 flex items-center", {
                   "bg-gray-700": filePath === file.path,
                 })}

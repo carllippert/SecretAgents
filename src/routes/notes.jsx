@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import LeftPanel from "../components/leftPanel";
 import FileExplorer from "../components/fileExplorer";
 import Editor from "@monaco-editor/react";
-import { useMarkdownContext } from "../context/MarkdownProvider";
+import { useFileContext } from "../context/FileProvider";
 
 export default function Notes() {
-  const { filePath, fileContent, updateFile } = useMarkdownContext();
+  const { filePath, fileContent, updateFile } = useFileContext();
 
   const [markdown, setMarkdown] = useState("**Hello world!!!**");
 

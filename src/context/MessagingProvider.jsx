@@ -133,7 +133,7 @@ export function MessagingProvider({ children }) {
       start: true,
       name: "Secret Agent",
       time: new Date().toISOString(),
-      message: response.text,
+      message: response,
       status: "sent",
       show_status: true,
     });
@@ -169,6 +169,15 @@ export function MessagingProvider({ children }) {
     }
   };
 
+  const saveMessagesToFile = async (fileName, messages) => {
+    try {
+      const filePath = appDocuments + "/messages/" + fileName;
+      await fs.writeFile(filePath, messages);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <MessagingContext.Provider
       value={{
@@ -177,12 +186,6 @@ export function MessagingProvider({ children }) {
         setCurrentChat,
         sendMessage,
         messages,
-        // filePath: filePathString,
-        // setFilePath,
-        // markdownPaths,
-        // fileContent,
-        // updateFile,
-        // createFile,
       }}
     >
       {children}
