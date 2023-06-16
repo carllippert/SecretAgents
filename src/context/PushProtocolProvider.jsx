@@ -59,7 +59,6 @@ export function PushProtocolProvider({ children }) {
         encryptedPGPPrivateKey: pushProtocolUser?.encryptedPrivateKey,
         account: ACCOUNT,
         signer: signer,
-
         env: "staging",
       });
 

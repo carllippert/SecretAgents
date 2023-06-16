@@ -94,15 +94,7 @@ export function FileProvider({ children }) {
 
   const saveFileToPolyBase = async (fileName, content) => {
     try {
-      // console.log("filename", fileName);
-      // console.log("content", content);
-      // console.log("trying to save file to polybase", fileName, content);
-      // // const note = await polybase.collection("User").create([`12`]);
-      // // .createFile([uuidv4(), fileName, content]);
-      // // .create([uuidv4(), fileName, content]);
       createPolybaseNote(fileName, content);
-
-      // console.log("Note Saved: ", note);
     } catch (error) {
       console.error(error);
     }

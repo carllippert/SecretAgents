@@ -19,6 +19,10 @@ const TauriContext = React.createContext({
   appDocuments: undefined,
   osType: undefined,
   fileSep: "/",
+  polling: false,
+  setPolling: undefined,
+  liveVectorBuilding: false,
+  setLiveVectorBuilding: undefined,
 });
 
 export const useTauriContext = () => useContext(TauriContext);
@@ -29,6 +33,8 @@ export function TauriProvider({ children }) {
   const [osType, setOsType] = useState();
   const [fileSep, setFileSep] = useState("/");
   const [appDocuments, setAppDocuments] = useState();
+  const [polling, setPolling] = useState(false);
+  const [liveVectorBuilding, setLiveVectorBuilding] = useState(false);
 
   useEffect(() => {
     // if you want to listen for event listeners, use mountID trick to call unlisten on old listeners
@@ -67,7 +73,19 @@ export function TauriProvider({ children }) {
 
   return (
     <TauriContext.Provider
-      value={{ loading, fileSep, downloads, documents, osType, appDocuments }}
+      value={{
+        loading,
+        fileSep,
+        downloads,
+        documents,
+        osType,
+        appDocuments,
+        liveVectorBuilding,
+        setLiveVectorBuilding,
+        polling,
+        setPolling,
+        setPolling,
+      }}
     >
       {children}
     </TauriContext.Provider>

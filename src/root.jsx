@@ -3,6 +3,7 @@ import {
   AiOutlineMessage,
   AiOutlineFolderOpen,
   AiOutlineRobot,
+  AiOutlineSetting,
 } from "react-icons/ai";
 
 export default function Root() {
@@ -20,6 +21,9 @@ export default function Root() {
         </Link>
         <Link className="btn btn-ghost" to="/agents">
           <AiOutlineRobot className="h-10 w-10" />
+        </Link>
+        <Link className="btn btn-ghost" to="/settings">
+          <AiOutlineSetting className="h-10 w-10" />
         </Link>
       </div>
       <div className="w-screen h-screen">

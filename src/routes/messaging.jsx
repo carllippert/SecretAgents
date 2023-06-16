@@ -42,20 +42,20 @@ export default function Messaging() {
                   </div>
                 </div>
                 <div className="flex-grow ml-4">
-                  <h3 className="text-lg font-semibold">Secret Agent</h3>
+                  <h3 className="text-lg font-semibold">🤖 Secret Agent</h3>
                   <p className="text-gray-500">Hey whats up?</p>
                 </div>
               </li>
               {chats.map((chat) => (
                 <li
-                  key={chat.id}
+                  key={chat.chatId}
                   onClick={() => {
-                    setCurrentChat(chat.id);
+                    setCurrentChat(chat.chatId);
                   }}
                   className={clsx(
                     "flex items-center px-4 py-3 border-b border-gray-700",
                     {
-                      "bg-gray-700": chat.id === currentChat,
+                      "bg-gray-700": chat.chatId === currentChat,
                     }
                   )}
                 >
@@ -63,13 +63,16 @@ export default function Messaging() {
                     <div className="w-12 h-12">
                       <img
                         className="object-cover w-full h-full rounded-full"
-                        src={chat.avatar}
+                        src={chat.profilePicture}
                         alt="User Avatar"
                       />
                     </div>
                   </div>
                   <div className="flex-grow ml-4">
-                    <h3 className="text-lg font-semibold">{chat.title}</h3>
+                    <h3 className="text-lg font-semibold">{`${chat.did.slice(
+                      7,
+                      12
+                    )}...${chat.did.slice(-4)}`}</h3>
                     <p className="text-gray-500">{chat.message}</p>
                   </div>
                 </li>

@@ -20,6 +20,7 @@ import { ethPersonalSign } from "@polybase/eth";
 import "./styles.css";
 
 import { Polybase } from "@polybase/client";
+import Settings from "./routes/settings";
 
 const defaultNamespace = import.meta.env.VITE_POLYBASE_NAMESPACE;
 const privateKey = import.meta.env.VITE_ETHEREUM_PRIVATE_KEY;
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
       {
         path: "notes",
         element: <Notes />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
       },
     ],
   },

@@ -62,14 +62,14 @@ const initChain = async () => {
 
 export const useLangchainContext = () => useContext(LangchainContext);
 export function LangchainProvider({ children }) {
-  const { fileSep, documents, downloads, appDocuments } = useTauriContext();
+  const { fileSep, documents, downloads, appDocuments, liveVectorBuilding } =
+    useTauriContext();
 
   const [markdownPaths, setMarkdownPaths] = useState([]);
   const [messagePaths, setMessagePaths] = useState([]);
   const [documentsAdded, setDocumentsAdded] = useState(false);
   const [loadingDocuments, setLoadingDocuments] = useState(false);
   const [modelState, setModelState] = useState("");
-  const [live, setLive] = useState(false);
 
   const getLocalMarkdownDirectories = async () => {
     try {
@@ -213,10 +213,10 @@ export function LangchainProvider({ children }) {
   };
 
   useEffect(() => {
-    // if (live) {
-    init();
-    // }
-  }, [markdownPaths]);
+    if (liveVectorBuilding) {
+      init();
+    }
+  }, [markdownPaths, liveVectorBuilding]);
 
   useEffect(() => {
     getLocalMarkdownDirectories();
