@@ -7,6 +7,8 @@ import TestPythonSideCar from "./routes/testPythonSidecar";
 import TestFileAccess from "./routes/testFileAccess";
 import Notes from "./routes/notes";
 import Messaging from "./routes/messaging";
+import Agents from "./routes/agents";
+
 import { TauriProvider } from "./context/TauriProvider";
 import { FileProvider } from "./context/FileProvider";
 import { MessagingProvider } from "./context/MessagingProvider";
@@ -52,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "files",
         element: <TestFileAccess />,
+      },
+      {
+        path: "agents",
+        element: <Agents />,
       },
       {
         path: "messaging",

@@ -8,6 +8,7 @@ export default function Notes() {
   const { filePath, fileContent, updateFile } = useFileContext();
 
   const [markdown, setMarkdown] = useState("");
+  const [userInteraction, setUserInteraction] = useState(false);
 
   const updateContext = () => {
     console.log("updateContext");
@@ -16,26 +17,30 @@ export default function Notes() {
 
   //from GPT
   useEffect(() => {
-    const delay = 1000; // Delay in milliseconds
-    let timeoutId;
+    if (userInteraction) {
+      const delay = 1000; // Delay in milliseconds
+      let timeoutId;
 
-    const debounceInput = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        updateContext();
-      }, delay);
-    };
+      const debounceInput = () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          updateContext();
+          setUserInteraction(false);
+        }, delay);
+      };
 
-    debounceInput();
+      debounceInput();
 
-    return () => {
-      clearTimeout(timeoutId); // Cleanup timeout on component unmount
-    };
+      return () => {
+        clearTimeout(timeoutId); // Cleanup timeout on component unmount
+      };
+    }
   }, [markdown]);
 
   const handleEditorChange = (value, event) => {
     console.log("EditorChanged", value);
     setMarkdown(value);
+    setUserInteraction(true);
   };
 
   //end GPT

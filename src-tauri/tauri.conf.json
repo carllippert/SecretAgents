@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "et",
+    "productName": "Secret Agent",
     "version": "0.0.0"
   },
   "tauri": {
@@ -57,7 +57,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "et",
+        "title": "Secret Agent",
         "width": 800,
         "height": 600
       }
