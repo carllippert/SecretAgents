@@ -56,7 +56,7 @@ export default function Notes() {
       <LeftPanel>
         <FileExplorer />
       </LeftPanel>
-      <div className="flex flex-col w-full h-full bg-pink-100">
+      <div className="flex flex-col w-full h-full">
         <Editor
           height="100vh"
           theme="vs-dark"

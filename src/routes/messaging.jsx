@@ -78,11 +78,7 @@ export default function Messaging() {
           </div>
         </div>
       </LeftPanel>
-      <div className="flex flex-col w-full h-full bg-pink-100">
-        {/* <div className="w-full h-full bg-pink-100">
-          w-full h-full bg-pink-100
-        </div> */}
-        {/* <Outlet /> */}
+      <div className="flex flex-col w-full h-full bg-primary-100">
         <Messages />
       </div>
     </div>

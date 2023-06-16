@@ -213,9 +213,9 @@ export function LangchainProvider({ children }) {
   };
 
   useEffect(() => {
-    if (live) {
-      init();
-    }
+    // if (live) {
+    init();
+    // }
   }, [markdownPaths]);
 
   useEffect(() => {
