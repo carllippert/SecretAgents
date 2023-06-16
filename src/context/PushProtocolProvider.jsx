@@ -104,10 +104,18 @@ export function PushProtocolProvider({ children }) {
     }));
   };
 
-  const addMessageToCurrentMessagesForChat = (chatId, newMessages) => {
-    setData((prevData) => ({
+  const addMessageToCurrentMessagesForChat = (chatId, newMessage) => {
+    // setMessages((prevData) => ({
+    //   ...prevData,
+    //   [chatId]: [...prevData[chatId], newValue],
+    // }));
+
+    setMessages((prevData) => ({
       ...prevData,
-      [chatId]: [...prevData[chatId], newValue],
+      [chatId]:
+        prevData && prevData[chatId]
+          ? [...prevData[chatId], newMessage]
+          : [newMessage],
     }));
   };
 
