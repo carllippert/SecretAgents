@@ -69,6 +69,7 @@ export function LangchainProvider({ children }) {
   const [documentsAdded, setDocumentsAdded] = useState(false);
   const [loadingDocuments, setLoadingDocuments] = useState(false);
   const [modelState, setModelState] = useState("");
+  const [live, setLive] = useState(false);
 
   const getLocalMarkdownDirectories = async () => {
     try {
@@ -212,7 +213,9 @@ export function LangchainProvider({ children }) {
   };
 
   useEffect(() => {
-    init();
+    if (live) {
+      init();
+    }
   }, [markdownPaths]);
 
   useEffect(() => {

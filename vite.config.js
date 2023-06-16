@@ -1,10 +1,17 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-
+// import legacy from "@vitejs/plugin-legacy";
+// import dotenv from "dotenv";
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
+  // dotenv: dotenv.config(),
   plugins: [react()],
-
+  // define: {
+  //   "process.env": {},
+  // },
+  define: {
+    global: {},
+  },
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   // prevent vite from obscuring rust errors
   clearScreen: false,

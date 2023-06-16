@@ -10,14 +10,14 @@ import tauriConfJson from "../../src-tauri/tauri.conf.json";
 import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 import { useTauriContext } from "./TauriProvider";
 // import { usePolybase, useDocument, useCollection } from "@polybase/react";
-// import { ethers } from "ethers";
-// import { user } from "@pushprotocol/restapi";
+import { ethers } from "ethers";
+import * as PushAPI from "@pushprotocol/restapi";
 
-// const PK = import.meta.env.VITE_ETHEREUM_PRIVATE_KEY;
-// const PUBKEY = import.meta.env.VITE_ETHEREUM_PUBLIC_KEY;
-// const Pkey = "0x" + PK;
-// const signer = new ethers.Wallet(Pkey);
-// const ACCOUNT = `eip155:${PUBKEY}`;
+const PK = import.meta.env.VITE_ETHEREUM_PRIVATE_KEY;
+const PUBKEY = import.meta.env.VITE_ETHEREUM_PUBLIC_KEY;
+const Pkey = "0x" + PK;
+const signer = new ethers.Wallet(Pkey);
+const ACCOUNT = `eip155:${PUBKEY}`;
 // NOTE: Add cacheable Tauri calls in this file
 //   that you want to use synchronously across components in your app
 

@@ -1,3 +1,4 @@
+window.global ||= window; //vite workaround
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -27,6 +28,7 @@ const defaultNamespace = import.meta.env.VITE_POLYBASE_NAMESPACE;
 const privateKey = import.meta.env.VITE_ETHEREUM_PRIVATE_KEY;
 
 console.log("defaultNamespace", defaultNamespace);
+console.log("privateKey", privateKey);
 
 const polybase = new Polybase({
   defaultNamespace,
