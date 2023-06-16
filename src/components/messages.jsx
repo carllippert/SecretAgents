@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IoMdSend } from "react-icons/io";
 import Message from "./message";
-import Container from "./container";
-import { useLangchainContext } from "../context/LangchainProvider";
+
 import { useMessagingContext } from "../context/MessagingProvider";
 
 const Messages = () => {
@@ -44,8 +43,6 @@ const Messages = () => {
               message={message.message}
               status={message.status}
               show_status={message.show_status}
-              // receipt={message.receipt}
-              // setMessages={setMessages}
             />
           ))}
           <div ref={messagesEndRef} />

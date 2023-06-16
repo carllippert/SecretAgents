@@ -7,15 +7,38 @@ import { useFileContext } from "../context/FileProvider";
 export default function Notes() {
   const { filePath, fileContent, updateFile } = useFileContext();
 
-  const [markdown, setMarkdown] = useState("**Hello world!!!**");
+  const [markdown, setMarkdown] = useState("");
+
+  const updateContext = () => {
+    console.log("updateContext");
+    updateFile(filePath, markdown);
+  };
+
+  //from GPT
+  useEffect(() => {
+    const delay = 2000; // Delay in milliseconds
+    let timeoutId;
+
+    const debounceInput = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        updateContext();
+      }, delay);
+    };
+
+    debounceInput();
+
+    return () => {
+      clearTimeout(timeoutId); // Cleanup timeout on component unmount
+    };
+  }, [markdown]);
 
   const handleEditorChange = (value, event) => {
-    // conso;
+    console.log("EditorChanged", value);
     setMarkdown(value);
-    //update file
-    updateFile(filePath, value);
-    console.log("value", value); // eslint-disable-line no-console
   };
+
+  //end GPT
 
   useEffect(() => {
     console.log("filePath", filePath);

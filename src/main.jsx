@@ -71,13 +71,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <PolybaseProvider polybase={polybase}>
         {/* <AuthProvider auth={auth} polybase={polybase}> */}
         <PushProtocolProvider>
-          <FileProvider>
-            <LangchainProvider>
+          <LangchainProvider>
+            <FileProvider>
               <MessagingProvider>
                 <RouterProvider router={router} />
               </MessagingProvider>
-            </LangchainProvider>
-          </FileProvider>
+            </FileProvider>
+          </LangchainProvider>
         </PushProtocolProvider>
         {/* </AuthProvider> */}
       </PolybaseProvider>

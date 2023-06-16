@@ -6,7 +6,7 @@ import { useFileContext } from "../context/FileProvider";
 import clsx from "clsx";
 
 const FileExplorer = () => {
-  const [newFilePath, setNewFilePath] = useState(undefined);
+  const [newFilePath, setNewFilePath] = useState("");
 
   const { markdownPaths, setFilePath, filePath, createFile } = useFileContext();
 
@@ -45,6 +45,7 @@ const FileExplorer = () => {
             />
           </li>
           {markdownPaths.map((file) => {
+            if (file.name === ".DS_Store") return null;
             // console.log("File", file);
             return (
               <li

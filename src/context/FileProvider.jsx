@@ -9,6 +9,7 @@ import { appWindow } from "@tauri-apps/api/window";
 import tauriConfJson from "../../src-tauri/tauri.conf.json";
 import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 import { useTauriContext } from "./TauriProvider";
+import { useLangchainContext } from "./LangchainProvider";
 import { usePolybase, useDocument, useCollection } from "@polybase/react";
 // import { v4 as uuidv4 } from "uuid";
 // NOTE: Add cacheable Tauri calls in this file
@@ -26,9 +27,10 @@ const FileContext = React.createContext({
 });
 
 export const useFileContext = () => useContext(FileContext);
+
 export function FileProvider({ children }) {
   const { fileSep, documents, downloads, appDocuments } = useTauriContext();
-
+  const { addDocuments } = useLangchainContext();
   const polybase = usePolybase();
 
   const [filePathString, setFilePathString] = useState("");
@@ -43,14 +45,18 @@ export function FileProvider({ children }) {
     setFileContent(content);
   };
 
-  const getLocalDirectories = async () => {
+  const getLocalMarkdownDirectories = async () => {
     try {
-      const entries = await readDir(appDocuments + "/markdown", {
-        recursive: true,
-      });
+      if (appDocuments !== undefined) {
+        const entries = await readDir(appDocuments + "/markdown", {
+          recursive: true,
+        });
 
-      setMarkdownPaths(entries);
-      setFilePath(entries[0].path);
+        setMarkdownPaths(entries);
+        setFilePath(entries[0].path);
+      } else {
+        console.log("appDocuments is undefined still");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -58,10 +64,14 @@ export function FileProvider({ children }) {
 
   const getMessageDirectories = async () => {
     try {
-      const entries = await readDir(appDocuments + "/messages", {
-        recursive: true,
-      });
-      setMessagePaths(entries);
+      if (appDocuments !== undefined) {
+        const entries = await readDir(appDocuments + "/messages", {
+          recursive: true,
+        });
+        setMessagePaths(entries);
+      } else {
+        console.log("appDocuments is undefined still");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -69,7 +79,9 @@ export function FileProvider({ children }) {
 
   const updateFile = async (filePath, content) => {
     try {
-      await fs.writeFile(filePath, content);
+      let path = await fs.writeFile(filePath, content);
+      console.log("file updated");
+      await addDocuments([content], [{ type: "note", ...path }]);
     } catch (error) {
       console.error(error);
     }
@@ -96,10 +108,14 @@ export function FileProvider({ children }) {
 
       const filePath = appDocuments + "/markdown/" + fileName + ".md";
       const content = fileName;
-      await fs.writeFile(filePath, content);
+      let path = await fs.writeFile(filePath, content);
+      console.log("path", path);
       //select as path
       setFilePath(filePath);
-      getLocalDirectories();
+      //update vector
+      addDocuments([content], [{ type: "note", ...path }]);
+
+      getLocalMarkdownDirectories();
       saveFileToPolyBase(fileName, content);
     } catch (error) {
       console.error(error);
@@ -107,16 +123,9 @@ export function FileProvider({ children }) {
   };
 
   useEffect(() => {
-    getLocalDirectories();
+    getLocalMarkdownDirectories();
     getMessageDirectories();
   }, [appDocuments]);
-
-  // useEffect(() => {
-  //   console.log("Checked Notes");
-  //   if (polybase_notes) {
-  //     console.log("Notes: ", polybase_notes);
-  //   }
-  // }, [polybase_notes]);
 
   return (
     <FileContext.Provider

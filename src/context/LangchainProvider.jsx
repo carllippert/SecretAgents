@@ -10,7 +10,6 @@ import { OpenAI } from "langchain/llms/openai";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { HumanChatMessage, SystemChatMessage } from "langchain/schema";
 import { useTauriContext } from "./TauriProvider";
-import { useFileContext } from "./FileProvider";
 import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
 
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
@@ -35,17 +34,58 @@ const LangchainContext = React.createContext({
   callModel: undefined,
   callVector: undefined,
   runChain: undefined,
+  addDocuments: undefined,
 });
 
 let vectorStore = null;
+
 const initVectorStore = async (texts, metadatas) => {
-  vectorStore = new MemoryVectorStore();
-  return;
+  vectorStore = new MemoryVectorStore(
+    new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
+  );
 };
+
+const model = new OpenAI({ openAIApiKey: OPEN_AI_KEY, temperature: 0.9 });
 
 export const useLangchainContext = () => useContext(LangchainContext);
 export function LangchainProvider({ children }) {
-  const { markdownPaths, messagePaths } = useFileContext();
+  const { fileSep, documents, downloads, appDocuments } = useTauriContext();
+
+  const [markdownPaths, setMarkdownPaths] = useState([]);
+  const [messagePaths, setMessagePaths] = useState([]);
+  const [documentsAdded, setDocumentsAdded] = useState(false);
+  const [loadingDocuments, setLoadingDocuments] = useState(false);
+
+  const getLocalMarkdownDirectories = async () => {
+    try {
+      if (appDocuments !== undefined) {
+        const entries = await readDir(appDocuments + "/markdown", {
+          recursive: true,
+        });
+
+        setMarkdownPaths(entries);
+      } else {
+        console.log("appDocuments is undefined still");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getMessageDirectories = async () => {
+    try {
+      if (appDocuments !== undefined) {
+        const entries = await readDir(appDocuments + "/messages", {
+          recursive: true,
+        });
+        setMessagePaths(entries);
+      } else {
+        console.log("appDocuments is undefined still");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const getMarkdownFileContent = async () => {
     if (markdownPaths.length === 0) {
@@ -115,26 +155,25 @@ export function LangchainProvider({ children }) {
   };
 
   const runChain = async (message) => {
-    const model = new OpenAI({ openAIApiKey: OPEN_AI_KEY, temperature: 0.9 });
+    // const { textsArray, metadataArray } = await getMarkdownFileContent();
 
-    const { textsArray, metadataArray } = await getMarkdownFileContent();
+    // console.log("textsArray", textsArray);
+    // console.log("metadataArray", metadataArray);
 
-    console.log("textsArray", textsArray);
-    console.log("metadataArray", metadataArray);
+    // const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
+    //   chunkSize: 32,
+    //   chunkOverlap: 0,
+    // });
 
-    const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
-      chunkSize: 32,
-      chunkOverlap: 0,
-    });
-
-    const mdOutput = await splitter.createDocuments(textsArray, metadataArray);
-    console.log("mdOutput", mdOutput);
+    // const mdOutput = await splitter.createDocuments(textsArray, metadataArray);
+    // console.log("mdOutput", mdOutput);
     //TODO: how to persist vectors?
     /* Create the vectorstore */
-    const vectorStore = await MemoryVectorStore.fromDocuments(
-      mdOutput,
-      new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
-    );
+    // const vectorStore = await MemoryVectorStore.fromDocuments(
+    //   mdOutput,
+    //   new OpenAIEmbeddings({ openAIApiKey: OPEN_AI_KEY })
+    // );
+    // await vectorStore.addDocuments(mdOutput);
     /* Create the chain */
     const chain = ConversationalRetrievalQAChain.fromLLM(
       model,
@@ -150,31 +189,66 @@ export function LangchainProvider({ children }) {
     const res = await chain.call({ question: message });
     console.log("question answer", res);
     return res.text;
+  };
+  const addDocuments = async (textsArray, metadataArray) => {
+    try {
+      setLoadingDocuments(true);
 
-    /* Ask it a follow up question */
-    // const followUpRes = await chain.call({
-    //   question: "Was that nice?",
-    // });
-    // console.log(followUpRes);
+      const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
+        chunkSize: 32,
+        chunkOverlap: 0,
+      });
+
+      const mdOutput = await splitter.createDocuments(
+        textsArray,
+        metadataArray
+      );
+
+      console.log("mdOutput", mdOutput);
+
+      await vectorStore.addDocuments(mdOutput);
+
+      console.log("documents added");
+      setDocumentsAdded(true);
+
+      return;
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoadingDocuments(false);
+    }
   };
 
   const init = async () => {
     if (!vectorStore) {
-      // if(markdownPaths.length > 0){
-      initVectorStore();
-      // }
+      console.log("initing vector store");
+      await initVectorStore();
+    }
+    if (!documentsAdded && !loadingDocuments && markdownPaths.length > 0) {
+      console.log("adding documents");
+
+      const { textsArray, metadataArray } = await getMarkdownFileContent();
+
+      await addDocuments(textsArray, metadataArray);
     }
   };
 
   useEffect(() => {
     init();
-  }, []);
+  }, [markdownPaths]);
+
+  useEffect(() => {
+    getLocalMarkdownDirectories();
+    getMessageDirectories();
+  }, [appDocuments]);
+
   return (
     <LangchainContext.Provider
       value={{
         callModel: runChain,
         callVector,
         runChain,
+        addDocuments,
       }}
     >
       {children}
