@@ -30,6 +30,7 @@ const MessagingContext = React.createContext({
 });
 
 export const useMessagingContext = () => useContext(MessagingContext);
+
 export function MessagingProvider({ children }) {
   const { fileSep, loading, documents, downloads, appDocuments } =
     useTauriContext();
@@ -39,73 +40,7 @@ export function MessagingProvider({ children }) {
 
   const [currentChat, setCurrentChat] = useState(0);
 
-  const [messages, setMessages] = useState([
-    // {
-    //   id: 1,
-    //   avatar:
-    //     "https://pbs.twimg.com/profile_images/1650519711593947137/0qNyuwSX_400x400.jpg",
-    //   start: "John Doe",
-    //   name: "John Doe",
-    //   time: "9:00 AM",
-    //   message: "Hello, how are you?",
-    //   status: "sent",
-    //   show_status: true,
-    //   receipt: true,
-    // },
-    // {
-    //   id: 2,
-    //   avatar:
-    //     "https://pbs.twimg.com/profile_images/1650519711593947137/0qNyuwSX_400x400.jpg",
-    //   start: "Jane Smith",
-    //   name: "Jane Smith",
-    //   time: "10:30 AM",
-    //   message: "I am doing great!",
-    //   status: "received",
-    //   show_status: true,
-    //   receipt: false,
-    // },
-    // // Add more message objects here...
-    // {
-    //   id: 5,
-    //   avatar:
-    //     "https://pbs.twimg.com/profile_images/1650519711593947137/0qNyuwSX_400x400.jpg",
-    //   start: "David Johnson",
-    //   name: "David Johnson",
-    //   time: "3:45 PM",
-    //   message: "See you tomorrow!",
-    //   status: "sent",
-    //   show_status: true,
-    //   receipt: true,
-    // },
-  ]);
-
-  // Zero will be special. will use for agent.
-  // const [chats, setChats] = useState([
-  //   {
-  //     id: 1,
-  //     avatar: "https://i.imgur.com/9KZk7BH.png",
-  //     title: "Chat 1",
-  //     message: "Last message in Chat 1...",
-  //   },
-  //   {
-  //     id: 2,
-  //     avatar: "https://i.imgur.com/9KZk7BH.png",
-  //     title: "Chat 2",
-  //     message: "Last message in Chat 2...",
-  //   },
-  //   {
-  //     id: 3,
-  //     avatar: "https://i.imgur.com/9KZk7BH.png",
-  //     title: "Chat 3",
-  //     message: "Last message in Chat 3...",
-  //   },
-  //   {
-  //     id: 4,
-  //     avatar: "https://i.imgur.com/9KZk7BH.png",
-  //     title: "Chat 4",
-  //     message: "Last message in Chat 4...",
-  //   },
-  // ]);
+  const [messages, setMessages] = useState([]);
 
   const addMessage = async (message) => {
     setMessages((messages) => [...messages, message]);

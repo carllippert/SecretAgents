@@ -22,6 +22,7 @@ const ACCOUNT = `eip155:${PUBKEY}`;
 // defaults are only for auto-complete
 const PushProtocolContext = React.createContext({
   chats: [],
+  messages: {}, // { chatId: [messages] }
 });
 
 export const usePushProtocolContext = () => useContext(PushProtocolContext);
@@ -64,28 +65,86 @@ export function PushProtocolProvider({ children }) {
 
       console.log("Decrypted PGP Key", response);
       setDecryptedPGPKey(response);
-      await fetchChats();
+      await fetchChats(response);
       return;
     } catch (e) {
       console.log(e);
     }
   };
 
-  const fetchChats = async () => {
+  const fetchChats = async (decryptedKey) => {
     console.log("Hit Fetch Chats");
     try {
       const response = await PushAPI.chat.chats({
         env: "staging",
         account: ACCOUNT,
         toDecrypt: true,
-        pgpPrivateKey: decryptedPGPKey,
+        pgpPrivateKey: decryptedKey || decryptedPGPKey,
       });
 
       console.log("Fetched Chats", response);
       setChats(response);
+
+      //TODO: fetch messages for each chat
+      await fetchMessages(decryptedKey, response);
+
       return;
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const totalFetch = async (chatId, decryptedKey) => {
+    try {
+      let args = {
+        account: ACCOUNT,
+        env: "staging",
+        conversationId: chatId, // receiver's address or chatId of a group
+      };
+
+      console.log("Args", args);
+
+      const conversationHash = await PushAPI.chat.conversationHash(args);
+
+      let nextArgs = {
+        env: "staging",
+        threadhash: conversationHash.threadHash,
+        account: ACCOUNT,
+        limit: 10,
+        toDecrypt: true,
+        pgpPrivateKey: decryptedKey,
+      };
+
+      console.log("Next Args", nextArgs);
+
+      const chatHistory = await PushAPI.chat.history(nextArgs);
+
+      // console.log("Chat History", chatHistory);
+      return chatHistory;
+    } catch (e) {
+      console.log("error fetching all chats", e);
+    }
+  };
+
+  const fetchMessages = async (decryptedKey, passedChats) => {
+    //Loop through hashes and fech messages for each
+    try {
+      let channelFetches = [];
+
+      let localChats = passedChats || chats;
+      let decryptKey = decryptedKey || decryptedPGPKey;
+
+      for (let i = 0; i < localChats.length; i++) {
+        channelFetches.push(totalFetch(localChats[i].chatId, decryptKey));
+      }
+
+      const allChats = await Promise.all(channelFetches);
+
+      //TODO: set messages state
+
+      console.log("All Chats", allChats);
+    } catch (e) {
+      console.log("error fetching all chats", e);
     }
   };
 
@@ -117,13 +176,6 @@ export function PushProtocolProvider({ children }) {
       let res = await createUser();
     }
   };
-
-  // useEffect(() => {
-  //   if (decryptedPGPKey) {
-  //     console.log(decryptedPGPKey);
-  //     fetchChats();
-  //   }
-  // }, [pushProtocolUser]);
 
   useEffect(() => {
     if (pushProtocolUser) {
