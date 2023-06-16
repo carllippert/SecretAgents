@@ -27,7 +27,8 @@ const polybase = new Polybase({
 polybase.signer(async (data) => {
   return {
     h: "eth-personal-sign",
-    sig: secp256k1.sign("0x" + privateKey, data),
+    // sig: secp256k1.sign("0x" + privateKey, data),
+    sig: ethPersonalSign("0x" + privateKey, data),
   };
 });
 
@@ -60,7 +61,7 @@ export default function TestFileAccess() {
 
   const saveFileToPolyBase = async () => {
     try {
-      const user = await polybase.collection("User").create([`42`]);
+      const user = await polybase.collection("User").create(["42", "Carlos"]);
       console.log("saved", user);
     } catch (error) {
       console.error(error);
