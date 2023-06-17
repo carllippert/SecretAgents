@@ -7,6 +7,7 @@ import {
   useMessagingContext,
 } from "../context/MessagingProvider";
 import clsx from "clsx";
+import { formatEtherAddressFromPushDID } from "../utils";
 
 export default function Messaging() {
   const { chats, currentChat, setCurrentChat } = useMessagingContext();
@@ -46,37 +47,39 @@ export default function Messaging() {
                   <p className="text-gray-500">Hey whats up?</p>
                 </div>
               </li>
-              {chats.map((chat) => (
-                <li
-                  key={chat.chatId}
-                  onClick={() => {
-                    setCurrentChat(chat.chatId);
-                  }}
-                  className={clsx(
-                    "flex items-center px-4 py-3 border-b border-gray-700",
-                    {
-                      "bg-gray-700": chat.chatId === currentChat,
-                    }
-                  )}
-                >
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12">
-                      <img
-                        className="object-cover w-full h-full rounded-full"
-                        src={chat.profilePicture}
-                        alt="User Avatar"
-                      />
+              {chats.map((chat) => {
+                console.log("Chat In Drawer", chat);
+                return (
+                  <li
+                    key={chat.chatId}
+                    onClick={() => {
+                      setCurrentChat(chat.chatId);
+                    }}
+                    className={clsx(
+                      "flex items-center px-4 py-3 border-b border-gray-700",
+                      {
+                        "bg-gray-700": chat.chatId === currentChat,
+                      }
+                    )}
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12">
+                        <img
+                          className="object-cover w-full h-full rounded-full"
+                          src={chat.profilePicture}
+                          alt="User Avatar"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-grow ml-4">
-                    <h3 className="text-lg font-semibold">{`${chat.did.slice(
-                      7,
-                      12
-                    )}...${chat.did.slice(-4)}`}</h3>
-                    <p className="text-gray-500">{chat.message}</p>
-                  </div>
-                </li>
-              ))}
+                    <div className="flex-grow ml-4">
+                      <h3 className="text-lg font-semibold">
+                        {formatEtherAddressFromPushDID(chat.did)}
+                      </h3>
+                      <p className="text-gray-500">{chat.message}</p>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>

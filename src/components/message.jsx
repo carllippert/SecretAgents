@@ -42,12 +42,12 @@ const Message = ({
       >
         {message}
       </div>
-      {show_status ? (
+      {/* {show_status ? (
         <div className="chat-footer opacity-50">
-          {/* <>{status === Status.Thinking ? <LoadingDots /> : <>{status}</>}</> */}
+          <>{status === Status.Thinking ? <LoadingDots /> : <>{status}</>}</>
           {status}
         </div>
-      ) : null}
+      ) : null} */}
     </div>
   );
 };

@@ -7,7 +7,13 @@ import { invoke } from "@tauri-apps/api";
 import { listen } from "@tauri-apps/api/event";
 import { appWindow } from "@tauri-apps/api/window";
 import tauriConfJson from "../../src-tauri/tauri.conf.json";
-import { APP_NAME, RUNNING_IN_TAURI } from "../utils";
+import {
+  APP_NAME,
+  RUNNING_IN_TAURI,
+  USERNAME,
+  formatEtherAddressFromPush,
+  formatEtherAddressFromPushDID,
+} from "../utils";
 import { useTauriContext } from "./TauriProvider";
 // import { usePolybase, useDocument, useCollection } from "@polybase/react";
 import { ethers } from "ethers";
@@ -119,12 +125,12 @@ export function PushProtocolProvider({ children }) {
     }));
   };
 
-  const totalFetch = async (chatId, decryptedKey) => {
+  const totalFetch = async (chat, decryptedKey) => {
     try {
       let args = {
         account: ACCOUNT,
         env: "staging",
-        conversationId: chatId, // receiver's address or chatId of a group
+        conversationId: chat.chatId, // receiver's address or chatId of a group
       };
 
       console.log("Args", args);
@@ -146,11 +152,27 @@ export function PushProtocolProvider({ children }) {
 
       console.log("Chat History", chatHistory);
 
-      replaceCurrentMessagesForChat(chatId, chatHistory);
-      // setMessages((prevData) => ({
-      //   ...prevData,
-      //   [chatId]: chatHistory,
-      // }));
+      let formattedChatHistory = chatHistory.map((message) => {
+        const fromMessagePubKey = formatEtherAddressFromPush(message.fromDID);
+        const toMessagePubKey = formatEtherAddressFromPush(message.toDID);
+        return {
+          ...message,
+          // id: uuidv4(),
+          id: message.timestamp,
+          avatar: chat.profilePicture,
+          start: fromMessagePubKey === PUBKEY ? true : false,
+          name:
+            toMessagePubKey === PUBKEY
+              ? USERNAME
+              : formatEtherAddressFromPushDID(message.toDID),
+          time: new Date(message.timestamp).toISOString(),
+          message: message.messageContent,
+          status: "sent",
+          show_status: true,
+        };
+      });
+
+      replaceCurrentMessagesForChat(chat.chatId, formattedChatHistory);
 
       return chatHistory;
     } catch (e) {
@@ -167,7 +189,7 @@ export function PushProtocolProvider({ children }) {
       let decryptKey = decryptedKey || decryptedPGPKey;
 
       for (let i = 0; i < localChats.length; i++) {
-        channelFetches.push(totalFetch(localChats[i].chatId, decryptKey));
+        channelFetches.push(totalFetch(localChats[i], decryptKey));
       }
 
       const allChats = await Promise.all(channelFetches);
