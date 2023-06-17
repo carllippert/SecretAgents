@@ -84,7 +84,6 @@ export function TauriProvider({ children }) {
         setLiveVectorBuilding,
         polling,
         setPolling,
-        setPolling,
       }}
     >
       {children}
