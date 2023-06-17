@@ -79,15 +79,15 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <TauriProvider>
       <PolybaseProvider polybase={polybase}>
         <LocalPolybaseProvider>
-          <PushProtocolProvider>
-            <LangchainProvider>
+          <LangchainProvider>
+            <PushProtocolProvider>
               <FileProvider>
                 <MessagingProvider>
                   <RouterProvider router={router} />
                 </MessagingProvider>
               </FileProvider>
-            </LangchainProvider>
-          </PushProtocolProvider>
+            </PushProtocolProvider>
+          </LangchainProvider>
         </LocalPolybaseProvider>
       </PolybaseProvider>
     </TauriProvider>

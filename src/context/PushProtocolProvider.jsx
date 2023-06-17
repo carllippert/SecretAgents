@@ -18,6 +18,7 @@ import { useTauriContext } from "./TauriProvider";
 // import { usePolybase, useDocument, useCollection } from "@polybase/react";
 import { ethers } from "ethers";
 import * as PushAPI from "@pushprotocol/restapi";
+import { useLangchainContext } from "./LangchainProvider";
 
 const PK = import.meta.env.VITE_ETHEREUM_PRIVATE_KEY;
 const PUBKEY = import.meta.env.VITE_ETHEREUM_PUBLIC_KEY;
@@ -36,10 +37,13 @@ const PushProtocolContext = React.createContext({
 export const usePushProtocolContext = () => useContext(PushProtocolContext);
 export function PushProtocolProvider({ children }) {
   const { fileSep, documents, downloads, appDocuments } = useTauriContext();
+  const { addDocuments } = useLangchainContext();
   const [pushProtocolUser, setPushProtocolUser] = useState(null);
   const [decryptedPGPKey, setDecryptedPGPKey] = useState(null);
   const [chats, setChats] = useState([]);
-  const [messages, setMessages] = useState({}); // { chatId: [messages] }
+  const [messages, setMessages] = useState({});
+
+  // { chatId: [messages] }
 
   const sendPushChat = async (messageText, toAddressDID) => {
     try {
@@ -126,6 +130,18 @@ export function PushProtocolProvider({ children }) {
       ...prevData,
       [chatId]: newMessagesArray,
     }));
+    //TODO: save to local storage
+    //TODO: "addDocuments"
+    let textArray = [];
+    let metadataArray = [];
+
+    newMessagesArray.forEach((message) => {
+      console.log("Adding Message Text", message.messageContent);
+      textArray.push(message.messageContent);
+      metadataArray.push({ ...message, type: "message" });
+    });
+
+    addDocuments(textArray, metadataArray);
   };
 
   const addMessageToCurrentMessagesForChat = (chatId, newMessage) => {
@@ -136,6 +152,18 @@ export function PushProtocolProvider({ children }) {
           ? [...prevData[chatId], newMessage]
           : [newMessage],
     }));
+    //TODO: save to local storage
+    //TODO: "addDocuments"
+    // let textArray = [];
+    // let metadataArray = [];
+
+    // newMessagesArray.forEach((message) => {
+    //   console.log("Adding Message Text", message.messageContent);
+    //   textArray.push(message.messageContent);
+    //   metadataArray.push({ ...message, type: "message" });
+    // });
+
+    addDocuments([newMessage.message], [{ ...newMessage, type: "message" }]);
   };
 
   const totalFetch = async (chat, decryptedKey) => {

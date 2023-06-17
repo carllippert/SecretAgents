@@ -169,7 +169,7 @@ export function LangchainProvider({ children }) {
       setModelState("Updating Model ...");
 
       const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
-        chunkSize: 32,
+        chunkSize: 64, //32
         chunkOverlap: 0,
       });
 
