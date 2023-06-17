@@ -7,7 +7,7 @@ import {
   useMessagingContext,
 } from "../context/MessagingProvider";
 import clsx from "clsx";
-import { formatEtherAddressFromPushDID } from "../utils";
+import { formatPushDIDForFrontEnd } from "../utils";
 
 export default function Messaging() {
   const { chats, currentChat, setCurrentChat } = useMessagingContext();
@@ -43,12 +43,12 @@ export default function Messaging() {
                   </div>
                 </div>
                 <div className="flex-grow ml-4">
-                  <h3 className="text-lg font-semibold">🤖 Secret Agent</h3>
-                  <p className="text-gray-500">Hey whats up?</p>
+                  <h3 className="text-lg font-semibold">Secret Agent 🤖</h3>
+                  <p className="text-gray-500">How can I help?</p>
                 </div>
               </li>
               {chats.map((chat) => {
-                console.log("Chat In Drawer", chat);
+                // console.log("Chat In Drawer", chat);
                 return (
                   <li
                     key={chat.chatId}
@@ -73,7 +73,7 @@ export default function Messaging() {
                     </div>
                     <div className="flex-grow ml-4">
                       <h3 className="text-lg font-semibold">
-                        {formatEtherAddressFromPushDID(chat.did)}
+                        {formatPushDIDForFrontEnd(chat.did)}
                       </h3>
                       <p className="text-gray-500">{chat.message}</p>
                     </div>

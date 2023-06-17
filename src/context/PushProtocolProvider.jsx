@@ -11,8 +11,8 @@ import {
   APP_NAME,
   RUNNING_IN_TAURI,
   USERNAME,
-  formatEtherAddressFromPush,
   formatEtherAddressFromPushDID,
+  formatPushDIDForFrontEnd,
 } from "../utils";
 import { useTauriContext } from "./TauriProvider";
 // import { usePolybase, useDocument, useCollection } from "@polybase/react";
@@ -30,6 +30,7 @@ const PushProtocolContext = React.createContext({
   chats: [],
   messages: {}, // { chatId: [messages] }
   addMessageToCurrentMessagesForChat: undefined,
+  sendPushChat: undefined,
 });
 
 export const usePushProtocolContext = () => useContext(PushProtocolContext);
@@ -40,6 +41,23 @@ export function PushProtocolProvider({ children }) {
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState({}); // { chatId: [messages] }
 
+  const sendPushChat = async (messageText, toAddressDID) => {
+    try {
+      const response = await PushAPI.chat.send({
+        messageContent: messageText,
+        messageType: "Text", // can be "Text" | "Image" | "File" | "GIF"
+        receiverAddress: toAddressDID,
+        signer: signer,
+        env: "staging",
+        pgpPrivateKey: decryptedPGPKey,
+      });
+
+      console.log("Push Chat Response?", response);
+      //setOnMessages or Replace?
+    } catch (e) {
+      console.log(e);
+    }
+  };
   const getUser = async () => {
     try {
       const user = await PushAPI.user.get({
@@ -111,11 +129,6 @@ export function PushProtocolProvider({ children }) {
   };
 
   const addMessageToCurrentMessagesForChat = (chatId, newMessage) => {
-    // setMessages((prevData) => ({
-    //   ...prevData,
-    //   [chatId]: [...prevData[chatId], newValue],
-    // }));
-
     setMessages((prevData) => ({
       ...prevData,
       [chatId]:
@@ -153,18 +166,19 @@ export function PushProtocolProvider({ children }) {
       console.log("Chat History", chatHistory);
 
       let formattedChatHistory = chatHistory.map((message) => {
-        const fromMessagePubKey = formatEtherAddressFromPush(message.fromDID);
-        const toMessagePubKey = formatEtherAddressFromPush(message.toDID);
+        const fromMessagePubKey = formatEtherAddressFromPushDID(
+          message.fromDID
+        );
+        const toMessagePubKey = formatEtherAddressFromPushDID(message.toDID);
         return {
           ...message,
-          // id: uuidv4(),
           id: message.timestamp,
           avatar: chat.profilePicture,
           start: fromMessagePubKey === PUBKEY ? true : false,
           name:
             toMessagePubKey === PUBKEY
               ? USERNAME
-              : formatEtherAddressFromPushDID(message.toDID),
+              : formatPushDIDForFrontEnd(message.toDID),
           time: new Date(message.timestamp).toISOString(),
           message: message.messageContent,
           status: "sent",
@@ -172,7 +186,10 @@ export function PushProtocolProvider({ children }) {
         };
       });
 
-      replaceCurrentMessagesForChat(chat.chatId, formattedChatHistory);
+      replaceCurrentMessagesForChat(
+        chat.chatId,
+        formattedChatHistory.reverse()
+      );
 
       return chatHistory;
     } catch (e) {
@@ -193,12 +210,6 @@ export function PushProtocolProvider({ children }) {
       }
 
       const allChats = await Promise.all(channelFetches);
-
-      console.log("ChatMap", messages);
-
-      //TODO: set messages state
-
-      console.log("All Chats", allChats);
     } catch (e) {
       console.log("error fetching all chats", e);
     }
@@ -237,7 +248,6 @@ export function PushProtocolProvider({ children }) {
     if (pushProtocolUser) {
       console.log(pushProtocolUser);
       decryptUserPGP();
-      // await fetchChats();
     }
   }, [pushProtocolUser]);
 
@@ -247,7 +257,12 @@ export function PushProtocolProvider({ children }) {
 
   return (
     <PushProtocolContext.Provider
-      value={{ chats, messages, addMessageToCurrentMessagesForChat }}
+      value={{
+        chats,
+        messages,
+        addMessageToCurrentMessagesForChat,
+        sendPushChat,
+      }}
     >
       {children}
     </PushProtocolContext.Provider>

@@ -9,9 +9,16 @@ import { appWindow } from "@tauri-apps/api/window";
 import { v4 as uuidv4 } from "uuid";
 
 import { useTauriContext } from "./TauriProvider";
-import { APP_NAME, RUNNING_IN_TAURI, USERNAME } from "../utils";
+import {
+  APP_NAME,
+  RUNNING_IN_TAURI,
+  USERNAME,
+  formatEtherAddressFromPushDID,
+} from "../utils";
 import { useLangchainContext } from "./LangchainProvider";
 import { usePushProtocolContext } from "./PushProtocolProvider";
+
+const PUBKEY = import.meta.env.VITE_ETHEREUM_PUBLIC_KEY;
 
 const CURRENT_USERNAME = USERNAME || "Anonymous";
 export const AGENT_AVATAR =
@@ -40,15 +47,13 @@ export function MessagingProvider({ children }) {
     chats,
     messages: pushMessages,
     addMessageToCurrentMessagesForChat,
+    sendPushChat,
   } = usePushProtocolContext();
 
   const [currentChat, setCurrentChat] = useState(0);
 
-  // const [messages, setMessages] = useState([]);
-
   const addMessage = async (message) => {
     addMessageToCurrentMessagesForChat(currentChat, message);
-    // setMessages((messages) => [...messages, message]);
   };
 
   const sendAgentMessage = async (messageText) => {
@@ -84,6 +89,20 @@ export function MessagingProvider({ children }) {
     //   show_status: true,
     // };
     console.log("sendChatMessage => ", messageText);
+    //Need to know who we are sending it too?
+    let thisChat = pushMessages[currentChat][0];
+
+    const fromMessagePubKey = formatEtherAddressFromPushDID(thisChat.fromDID);
+    // const toMessagePubKey = formatEtherAddressFromPush(thisChat.toDID);
+
+    //get the key that is not pubkey
+    const otherWalletAddressDID =
+      fromMessagePubKey === PUBKEY ? thisChat.toDID : thisChat.fromDID;
+
+    await sendPushChat(messageText, otherWalletAddressDID);
+
+    //TODO: Send Chat Via PushProtocol
+
     //TODO: send message via pushProtocool
     // addMessage(message);
     return true;

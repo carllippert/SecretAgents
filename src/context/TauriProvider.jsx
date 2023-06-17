@@ -33,8 +33,8 @@ export function TauriProvider({ children }) {
   const [osType, setOsType] = useState();
   const [fileSep, setFileSep] = useState("/");
   const [appDocuments, setAppDocuments] = useState();
-  const [polling, setPolling] = useState(true);
-  const [liveVectorBuilding, setLiveVectorBuilding] = useState(true);
+  const [polling, setPolling] = useState(false);
+  const [liveVectorBuilding, setLiveVectorBuilding] = useState(false);
 
   useEffect(() => {
     // if you want to listen for event listeners, use mountID trick to call unlisten on old listeners
