@@ -62,6 +62,4 @@ Rust Backend - Tauri is written in Rust and allows you to let rust do the heavy 
 
 [Python Sidecar](https://tauri.app/v1/guides/building/sidecar/) - Tauri has a system for "embedding" any external binary and allowing the Javascript and Rust to talk back and forth with an asynchronous messaging. system. AI, Data Science, ML etc are fields very reliant on the Python language. We added a python sidecar to the application to allow additions to the project to be able to access the broader tool landscape.
 
-- this isn't completely true but the goal was libp2p which can use other transport protocols, and didn't have sufficient time to use a local GPT model so used OpenAI API.
-
 ##### Polybase Explorer: https://explorer.testnet.polybase.xyz/studio/pk%2F0x033b12efa243188656bf26eea76a95de67fa192f0e1482f7af816e5ef2131c80f83141ed91235ae6619d587bee9162a0c15a3c310e464ec4556789c1930d1ebe%2Fsecret_agent
