@@ -1,6 +1,9 @@
 # Secret Agent 🤖
 
-TLDR: Notes + Messaging + AI Agents = The Next Era of Personal Productivity.
+## Inspiration
+
+### TLDR: Notes + Messaging + AI Agents = The Next Era of Personal Productivity.
+
 -> Local
 -> Private
 -> Powerful
@@ -15,21 +18,21 @@ I also use Telegram and other messaging services a lot to talk with teammates.
 
 I rebuilt these systems with web3 and AI in mind from the core using the best of whats available .
 
-Use the notes section to write and collaborate on documents:
+### Use the notes section to write and collaborate on documents:
 
 Think of it as a simple version of Obsidian or Roam or Notion today.
 All data and saved to web3 storage via Polybase.
 Its also saved locally in simple files and a vector db for use with your agents.
 
-Use the messaging section to talk to coworkers or your local AI Agents:
+### Use the messaging section to talk to coworkers or your local AI Agents:
 
 We consider AI Agents and people to be in the same category at the architecture level and treat them the same. Invite them to group chats, have them as a collaborator on docs. Whatever you want.
 
-Design and update your agents:
+### Design and update your agents:
 
 Agents are not a static thing. They also can do more than write text. They can use tools and leverage internal data. We give you a WYSIWG editor as a base to start extending what agents can do for your business without locking you into someone elses platform.
 
-Everything is always accessible to your agents:
+### Everything is always accessible to your agents:
 
 The whole system is built around the idea of data should be yours. It should be local. We don't need servers for this stuff and AI Agents are most useful when they have access to more information about your work.
 
